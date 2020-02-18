@@ -11,7 +11,6 @@ public class LightUpOnCollision : MonoBehaviour
     void Start()
     {
         mInputController = GameObject.Find("ToolController").GetComponent<InputController>();
-        Debug.Log(mInputController != null);
         collision = false;
     }
 

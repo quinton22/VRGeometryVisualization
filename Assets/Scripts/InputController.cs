@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 public class InputController : MonoBehaviour
 {
     public enum Tool
@@ -13,6 +14,8 @@ public class InputController : MonoBehaviour
     }
 
     public Tool m_CurrentTool;
+    // what to divide 1 unit up into
+    public float m_ScaleDivision = 2;
     private Text m_ToolText;
     private Tool drawing;
     private Vector3 initialPosition;
@@ -26,6 +29,7 @@ public class InputController : MonoBehaviour
     private GameObject m_VolumeCopy;
     private GameObject m_LineForArea;
     private GameObject m_AreaForVolume;
+    private Vector3 m_VolumeForward;
     [SerializeField] private GameObject m_Parent;
     [SerializeField] private GameObject m_Pointer;
     private PointerController m_PointerController;
@@ -190,15 +194,80 @@ public class InputController : MonoBehaviour
             switch (m_CurrentTool)
             {
                 case Tool.Line:
+                    float sd = m_ScaleDivision * 2;
+                    // round to nearest (sub)unit
+                    Vector3 scaleL = m_LineCopy.transform.localScale;
+                    scaleL.y *= sd;
+                    if (scaleL.y < 1) {
+                        scaleL.y = 1;
+                    }
+                    else
+                    {
+                        scaleL.y = Mathf.Round(scaleL.y);
+                    }
+                    scaleL.y /= sd;
+
+                    float deltaY = scaleL.y - m_LineCopy.transform.localScale.y;
+
+                    m_LineCopy.transform.localScale = scaleL;
+
+                    // move position to adjust for change of size
+                    Vector3 posL = m_LineCopy.transform.position;
+                    posL += m_LineCopy.transform.up * deltaY;
+                    m_LineCopy.transform.position = posL;
+
                     m_LineCopy = null;
                     break;
                 case Tool.Area:
+                    Vector3 scaleA = m_AreaCopy.transform.localScale;
+                    scaleA.x *= m_ScaleDivision;
+                    if (scaleA.x < 1) {
+                        scaleA.x = 1;
+                    }
+                    else
+                    {
+                        scaleA.x = Mathf.Round(scaleA.x);
+                    }
+
+                    scaleA.x /= m_ScaleDivision;
+
+                    float deltaX = scaleA.x - m_AreaCopy.transform.localScale.x;
+
+                    m_AreaCopy.transform.localScale = scaleA;
+
+                    // move position
+                    Vector3 posA = m_AreaCopy.transform.position;
+                    posA += m_AreaCopy.transform.right * deltaX / 2;
+                    m_AreaCopy.transform.position = posA;
+
                     m_AreaCopy = null;
                     Destroy(m_LineForArea);
                     break;
                 case Tool.Volume:
+                    Vector3 scaleV = m_VolumeCopy.transform.localScale;
+                    scaleV.z *= m_ScaleDivision;
+                    if (scaleV.z < 1)
+                    {
+                        scaleV.z = 1;
+                    }
+                    else
+                    {
+                        scaleV.z = Mathf.Round(scaleV.z);
+                    }
+
+                    scaleV.z /= m_ScaleDivision;
+
+                    float deltaZ = scaleV.z - m_VolumeCopy.transform.localScale.z;
+
+                    m_VolumeCopy.transform.localScale = scaleV;
+
+                    // move position
+                    Vector3 posV = m_VolumeCopy.transform.position;
+                    posV += m_VolumeForward.normalized * deltaZ / 2;
+                    m_VolumeCopy.transform.position = posV;
+
                     m_VolumeCopy = null;
-                    //Destroy(m_AreaForVolume);
+                    Destroy(m_AreaForVolume);
                     break;
                 case Tool.None:
                 default:
@@ -249,20 +318,15 @@ public class InputController : MonoBehaviour
             m_VolumeCopy.transform.localRotation = m_AreaForVolume.transform.localRotation;
             m_VolumeCopy.transform.localScale = m_AreaForVolume.transform.localScale;
 
-            Vector3 proj = Vector3.Project((currentPosition - initialPosition), m_VolumeCopy.transform.forward);
+            m_VolumeForward = Vector3.Project((currentPosition - initialPosition), m_VolumeCopy.transform.forward);
 
             m_VolumeCopy.transform.localScale = new Vector3(
                 m_VolumeCopy.transform.localScale.x,
                 m_VolumeCopy.transform.localScale.y,
-                proj.magnitude
+                m_VolumeForward.magnitude
             );
 
-            Debug.Log($"cur-init: {currentPosition - initialPosition}");
-            Debug.Log($"normal: {(currentPosition - initialPosition).normalized}");
-            Debug.Log($"mag: {(currentPosition - initialPosition).magnitude}");
-            Debug.Log($"normal mag: {(currentPosition - initialPosition).normalized.magnitude}");
-
-            m_VolumeCopy.transform.position = initialPosition + proj.normalized * m_VolumeCopy.transform.localScale.z / 2;
+            m_VolumeCopy.transform.position = initialPosition + m_VolumeForward.normalized * m_VolumeCopy.transform.localScale.z / 2;
         }
     }
 }
