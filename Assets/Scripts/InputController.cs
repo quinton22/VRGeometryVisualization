@@ -148,6 +148,7 @@ public class InputController : MonoBehaviour
                     drawing = Tool.Volume;
                     initialPosition = m_AreaForVolume.transform.position;
                     m_VolumeCopy = UnityEngine.Object.Instantiate(m_Volume, initialPosition, Quaternion.identity, m_Parent.transform);
+                    m_VolumeCopy.GetComponent<VolumeForwardController>().ZDirection = -m_AreaForVolume.transform.forward;
                     Dragged();
                 }
                 break;
@@ -327,6 +328,8 @@ public class InputController : MonoBehaviour
             );
 
             m_VolumeCopy.transform.position = initialPosition + m_VolumeForward.normalized * m_VolumeCopy.transform.localScale.z / 2;
+
+            m_VolumeCopy.GetComponent<VolumeForwardController>().dir = Vector3.Project((currentPosition - initialPosition), -m_AreaForVolume.transform.forward);
         }
     }
 }
