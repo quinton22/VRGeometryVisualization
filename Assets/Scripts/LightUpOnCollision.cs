@@ -28,6 +28,11 @@ public class LightUpOnCollision : MonoBehaviour
             Material mat = meshRenderer.material;
             bool enabled = mat.IsKeywordEnabled("_EMISSION");
 
+            if (mat.GetFloat("_Mode") == 2)
+            {
+                mat.color = Color.white;
+            }
+
             if (!enabled && checkCurrentTool())
             {
                 mat.EnableKeyword("_EMISSION");
@@ -47,6 +52,11 @@ public class LightUpOnCollision : MonoBehaviour
             MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
             Material mat = meshRenderer.material;
             bool enabled = mat.IsKeywordEnabled("_EMISSION");
+            
+            if (mat.GetFloat("_Mode") == 2) // fade shader
+            {
+                mat.color = Color.clear;
+            }
 
             if (enabled)
             {
@@ -62,7 +72,9 @@ public class LightUpOnCollision : MonoBehaviour
     bool checkCurrentTool()
     {
         InputController.Tool ct = mInputController.m_CurrentTool;
-        return (ct == InputController.Tool.Area && gameObject.name.Contains("Line")) || (ct == InputController.Tool.Volume && transform.parent.gameObject.name.Contains("Area"));
+        return (ct == InputController.Tool.Area && gameObject.name.Contains("Line")) ||
+            (ct == InputController.Tool.Volume && transform.parent.gameObject.name.Contains("Area")) ||
+            (ct == InputController.Tool.Mesh && transform.parent.parent.gameObject.name.Contains("Mesh"));
     }
 
 

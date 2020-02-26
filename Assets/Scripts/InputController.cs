@@ -10,7 +10,8 @@ public class InputController : MonoBehaviour
         None,
         Line,
         Area,
-        Volume
+        Volume,
+        Mesh
     }
 
     public Tool m_CurrentTool;
@@ -24,9 +25,12 @@ public class InputController : MonoBehaviour
     private GameObject m_Line;
     private GameObject m_Area;
     private GameObject m_Volume;
+    private GameObject m_Mesh;
     private GameObject m_LineCopy;
     private GameObject m_AreaCopy;
     private GameObject m_VolumeCopy;
+    private GameObject m_MeshCopy;
+    private MeshCreatorController m_MeshCreatorController;
     private GameObject m_LineForArea;
     private GameObject m_AreaForVolume;
     private Vector3 m_VolumeForward;
@@ -43,6 +47,7 @@ public class InputController : MonoBehaviour
         m_Line = m_Shape.transform.Find("Line").gameObject;
         m_Area = m_Shape.transform.Find("Area").gameObject;
         m_Volume = m_Shape.transform.Find("Volume").gameObject;
+        m_Mesh = m_Shape.transform.Find("Mesh").gameObject;
 
         m_PointerController = m_Pointer.GetComponent<PointerController>();
     }
@@ -71,6 +76,12 @@ public class InputController : MonoBehaviour
             m_CurrentTool = Tool.Volume;
             SetToolText();
         }
+        else if (Input.GetKeyDown("m"))
+        {
+            // mesh tool
+            m_CurrentTool = Tool.Mesh;
+            SetToolText();
+        }
         else if (Input.GetKeyDown("n"))
         {
             // none
@@ -91,6 +102,15 @@ public class InputController : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             MouseUp();
+        }
+
+        if (drawing == Tool.Mesh)
+        {
+            Debug.Log("drawing Mesh");
+            
+            // don't need to hold and click to create line
+            //currentPosition = m_Pointer.transform.position;
+            DrawMesh();
         }
     }
 
@@ -113,6 +133,9 @@ public class InputController : MonoBehaviour
                 break;
             case Tool.Volume:
                 m_ToolText.text += "Volume";
+                break;
+            case Tool.Mesh:
+                m_ToolText.text += "Mesh";
                 break;
             default:
                 m_ToolText.text = "Error!";
@@ -152,6 +175,12 @@ public class InputController : MonoBehaviour
                     Dragged();
                 }
                 break;
+            case Tool.Mesh:
+                
+                
+                // TODO
+                // maybe create a plane that we draw on with a grid (could make the grid lines variable in spacing)
+                break;
             case Tool.None:
             default:
                 drawing = Tool.None;
@@ -176,6 +205,9 @@ public class InputController : MonoBehaviour
                 currentPosition = m_Pointer.transform.position;
                 DrawVolume();
                 break;
+            case Tool.Mesh:
+                // TODO
+                break;
             case Tool.None:
             default:
                 break;
@@ -185,12 +217,16 @@ public class InputController : MonoBehaviour
     void MouseUp()
     {
         // finish drawing
-        if (drawing != Tool.None)
+        if (drawing != Tool.None || m_CurrentTool == Tool.Mesh)
         {
-            drawing = Tool.None;
+            if (m_CurrentTool != Tool.Mesh)
+            {
+                drawing = Tool.None;
 
-            initialPosition = Vector3.zero;
-            currentPosition = Vector3.zero;
+                initialPosition = Vector3.zero;
+                currentPosition = Vector3.zero;
+            }
+            
             // drag out
             switch (m_CurrentTool)
             {
@@ -270,6 +306,49 @@ public class InputController : MonoBehaviour
                     m_VolumeCopy = null;
                     Destroy(m_AreaForVolume);
                     break;
+                case Tool.Mesh:
+                    if (drawing != Tool.Mesh)
+                    {
+                        drawing = Tool.Mesh;
+                        initialPosition = m_Pointer.transform.position;
+                        m_MeshCopy = UnityEngine.Object.Instantiate(m_Mesh, initialPosition, Quaternion.identity, m_Parent.transform);
+                        m_MeshCreatorController = m_MeshCopy.GetComponent<MeshCreatorController>();
+                        
+                        m_LineCopy = m_MeshCreatorController.AddLine(initialPosition);
+                        DrawMesh();
+                    }
+                    else
+                    {
+                        // want to end current line and start new line unless we are back at the starting position
+                        // TODO: rescale to some subunit based on line length or 2D grid
+                        initialPosition = m_Pointer.transform.position;
+
+                        GameObject originalLine = m_MeshCreatorController.GetLine(0);
+                        if (originalLine.transform.Find("Sphere").gameObject.GetComponent<LightUpOnCollision>().collision)
+                        {
+                            // end mesh
+                            m_LineCopy = null;
+                            drawing = Tool.None;
+
+                            m_MeshCreatorController.CreateMesh();
+                            m_MeshCreatorController.DeleteLines();
+
+                            
+                        }
+                        else
+                        {
+                            m_LineCopy = m_MeshCreatorController.AddLine(initialPosition);
+                            DrawMesh();
+                        }
+
+          
+                        //TODO: if new line intersects sphere of first line then finish then call a fxn that creates the mesh
+                        // mesh.create()
+
+                        
+                    }
+                    // TODO
+                    break;
                 case Tool.None:
                 default:
                     break;
@@ -330,6 +409,22 @@ public class InputController : MonoBehaviour
             m_VolumeCopy.transform.position = initialPosition + m_VolumeForward.normalized * m_VolumeCopy.transform.localScale.z / 2;
 
             m_VolumeCopy.GetComponent<VolumeForwardController>().dir = Vector3.Project((currentPosition - initialPosition), -m_AreaForVolume.transform.forward);
+        }
+    }
+
+    void DrawMesh()
+    {
+        if (m_MeshCopy != null && m_LineCopy != null)
+        {
+            currentPosition = m_Pointer.transform.position;
+
+            m_LineCopy.transform.position = (initialPosition + currentPosition) / 2;
+            m_LineCopy.transform.localScale = new Vector3(
+                m_LineCopy.transform.localScale.x,
+                (initialPosition - currentPosition).magnitude / 2,
+                m_LineCopy.transform.localScale.z);
+            m_LineCopy.transform.localRotation = Quaternion.LookRotation((currentPosition - initialPosition).normalized);
+            m_LineCopy.transform.Rotate(90, 0, 0);
         }
     }
 }
