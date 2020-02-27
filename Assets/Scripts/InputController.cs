@@ -33,6 +33,7 @@ public class InputController : MonoBehaviour
     private MeshCreatorController m_MeshCreatorController;
     private GameObject m_LineForArea;
     private GameObject m_AreaForVolume;
+    private GameObject m_MeshForVolume;
     private Vector3 m_VolumeForward;
     [SerializeField] private GameObject m_Parent;
     [SerializeField] private GameObject m_Pointer;
@@ -163,15 +164,30 @@ public class InputController : MonoBehaviour
                 }
                 break;
             case Tool.Volume:
-                if (m_PointerController.collidingObject != null && m_PointerController.collidingObject.transform.parent.gameObject.name.Contains("Area"))
+                if (m_PointerController.collidingObject != null)
                 {
-                    m_AreaForVolume = m_PointerController.collidingObject.transform.parent.gameObject;
-                    drawing = Tool.Volume;
-                    initialPosition = m_AreaForVolume.transform.position;
-                    m_VolumeCopy = UnityEngine.Object.Instantiate(m_Volume, initialPosition, Quaternion.identity, m_Parent.transform);
-                    m_VolumeCopy.GetComponent<VolumeForwardController>().ZDirection = -m_AreaForVolume.transform.forward;
+                    if (m_PointerController.collidingObject.transform.parent.gameObject.name.Contains("Area"))
+                    {
+                        m_AreaForVolume = m_PointerController.collidingObject.transform.parent.gameObject;
+                        drawing = Tool.Volume;
+                        initialPosition = m_AreaForVolume.transform.position;
+                        m_VolumeCopy = UnityEngine.Object.Instantiate(m_Volume, initialPosition, Quaternion.identity, m_Parent.transform);
+                        m_VolumeCopy.GetComponent<VolumeForwardController>().ZDirection = -m_AreaForVolume.transform.forward;
+                    }
+                    else if (m_PointerController.collidingObject.transform.name.Contains("Mesh"))
+                    {
+                        // start extruding mesh
+                        Debug.Log("extrude mesh");
+                        m_MeshForVolume = m_PointerController.collidingObject;
+                        drawing = Tool.Volume;
+                        initialPosition = m_MeshForVolume.transform.position;
+                        
+                        // TODO: drag the top submesh up, leaving bottomsub mesh where its at and fill in 
+                        m_MeshCreatorController = m_MeshForVolume.GetComponent<MeshCreatorController>();
+                    }
+
                     Dragged();
-                }
+                } 
                 break;
             case Tool.Mesh:
                 
@@ -279,30 +295,38 @@ public class InputController : MonoBehaviour
                     Destroy(m_LineForArea);
                     break;
                 case Tool.Volume:
-                    Vector3 scaleV = m_VolumeCopy.transform.localScale;
-                    scaleV.z *= m_ScaleDivision;
-                    if (scaleV.z < 1)
+                    if (m_VolumeCopy != null)
                     {
-                        scaleV.z = 1;
+                        Vector3 scaleV = m_VolumeCopy.transform.localScale;
+                        scaleV.z *= m_ScaleDivision;
+                        if (scaleV.z < 1)
+                        {
+                            scaleV.z = 1;
+                        }
+                        else
+                        {
+                            scaleV.z = Mathf.Round(scaleV.z);
+                        }
+
+                        scaleV.z /= m_ScaleDivision;
+
+                        float deltaZ = scaleV.z - m_VolumeCopy.transform.localScale.z;
+
+                        m_VolumeCopy.transform.localScale = scaleV;
+
+                        // move position
+                        Vector3 posV = m_VolumeCopy.transform.position;
+                        posV += m_VolumeForward.normalized * deltaZ / 2;
+                        m_VolumeCopy.transform.position = posV;
+
+                        m_VolumeCopy = null;
+                        Destroy(m_AreaForVolume);
                     }
-                    else
+                    else if (m_MeshForVolume != null)
                     {
-                        scaleV.z = Mathf.Round(scaleV.z);
+                        m_MeshForVolume.GetComponent<LightUpOnCollision>().SetEnabled(false);
+                        m_MeshForVolume = null;
                     }
-
-                    scaleV.z /= m_ScaleDivision;
-
-                    float deltaZ = scaleV.z - m_VolumeCopy.transform.localScale.z;
-
-                    m_VolumeCopy.transform.localScale = scaleV;
-
-                    // move position
-                    Vector3 posV = m_VolumeCopy.transform.position;
-                    posV += m_VolumeForward.normalized * deltaZ / 2;
-                    m_VolumeCopy.transform.position = posV;
-
-                    m_VolumeCopy = null;
-                    Destroy(m_AreaForVolume);
                     break;
                 case Tool.Mesh:
                     if (drawing != Tool.Mesh)
@@ -408,6 +432,10 @@ public class InputController : MonoBehaviour
             m_VolumeCopy.transform.position = initialPosition + m_VolumeForward.normalized * m_VolumeCopy.transform.localScale.z / 2;
 
             m_VolumeCopy.GetComponent<VolumeForwardController>().dir = Vector3.Project((currentPosition - initialPosition), -m_AreaForVolume.transform.forward);
+        }
+        else if (m_MeshForVolume != null)
+        {
+            m_MeshCreatorController.UpdateMesh(Vector3.Project((currentPosition - initialPosition), m_MeshCreatorController.GetNorm()));
         }
     }
 

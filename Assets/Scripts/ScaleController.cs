@@ -15,7 +15,7 @@ public class ScaleController : MonoBehaviour
     private List<RectTransform> CrossAxisTickMarks = new List<RectTransform>();
     private string m_ScaleDim;
     private bool m_FollowCamera = false;
-    private float m_ScaleAmount = 500;
+    private float m_ScaleAmount = 500; // TODO: hook this up with the scale division in inputcontroller
     private bool m_Volume = false;
     private VolumeForwardController m_VolumeForwardController;
     // Start is called before the first frame update

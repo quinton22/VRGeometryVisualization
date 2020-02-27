@@ -1,27 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MeshCreatorController : MonoBehaviour
 {
-    private GameObject m_SubMeshGameObject;
-    private MeshCollider m_SubMeshCollider;
     private Mesh m_Mesh;
+    private MeshCollider m_MeshCollider;
     public GameObject m_Line;
     public Vector3 m_PositionOffset;
+    private Vector3[] m_AreaVertices;
     private List<GameObject> m_MeshLines = new List<GameObject>();
     public List<Vector3> m_Vertices = new List<Vector3>();
     public List<int> m_Triangles = new List<int>();
 
     void Start()
     {
-        m_SubMeshGameObject = transform.Find("SubMesh").gameObject;
+        // gameObject = transform.Find("SubMesh").gameObject;
 
         m_Mesh = new Mesh();
-        m_SubMeshGameObject.GetComponent<MeshFilter>().mesh = m_Mesh;
+        GetComponent<MeshFilter>().mesh = m_Mesh;
 
-        m_SubMeshCollider = m_SubMeshGameObject.GetComponent<MeshCollider>();
-        m_SubMeshCollider.sharedMesh = m_Mesh;
+        m_MeshCollider = GetComponent<MeshCollider>();
+        m_MeshCollider.sharedMesh = m_Mesh;
 
 
         m_Line = transform.Find("Line").gameObject;
@@ -62,26 +63,53 @@ public class MeshCreatorController : MonoBehaviour
         if (m_Vertices.Count < 3)
             return;
 
-        UpdateTriangles();
-        
+        m_AreaVertices = m_Vertices.ToArray();
+
+        RealUpdateMesh();
+    }
+
+    private void RealUpdateMesh(float length = .001f)
+    {
+        m_Mesh.Clear();
+
+        UpdateVertices(length);
+        UpdateTriangles();      
 
         m_Mesh.vertices = m_Vertices.ToArray();
         m_Mesh.triangles = m_Triangles.ToArray();
 
+        m_Mesh.Optimize();
         m_Mesh.RecalculateNormals();
 
-        GameObject subMesh2 = Instantiate(m_SubMeshGameObject, m_SubMeshGameObject.transform.position, m_SubMeshGameObject.transform.localRotation, transform);
-        Mesh mesh2 = subMesh2.GetComponent<MeshFilter>().mesh;
+        m_MeshCollider.sharedMesh = m_Mesh;
+    }
 
-        // flip triangles
-        List<int> triangles2 = new List<int>(mesh2.triangles);
-        triangles2.Reverse();
-        mesh2.triangles = triangles2.ToArray();
+    public void UpdateMesh(Vector3 dir)
+    {
+        float m = (dir.normalized - GetNorm()).magnitude;
 
-        mesh2.RecalculateNormals();
+        float update = dir.magnitude;
 
-        m_SubMeshCollider.sharedMesh = mesh2;
+        if (m > .00001) // same direction as norm
+        {
+            for (int i = 0; i < m_AreaVertices.Length; ++i)
+            {
+                m_Vertices[i] = m_AreaVertices[i];
+            }
+        }
+        else
+        {
+            for (int i = 0; i < m_AreaVertices.Length; ++i)
+            {
+                m_Vertices[i] = m_AreaVertices[i] + dir;
+            }
 
+            update = 0;
+        }
+        
+        m_Vertices.RemoveRange(m_AreaVertices.Length, 5*m_AreaVertices.Length);
+
+        RealUpdateMesh(update);
     }
 
     public void DeleteLines()
@@ -92,14 +120,58 @@ public class MeshCreatorController : MonoBehaviour
         m_MeshLines.Clear();
     }
 
+    public Vector3 GetNorm()
+    {
+        return Vector3.Cross(m_Vertices[1] - m_Vertices[0], m_Vertices[2] - m_Vertices[0]).normalized;
+    }
+
+    private void UpdateVertices(float length = .001f)
+    {
+        int numVertices = m_AreaVertices.Length;
+        Vector3 norm = GetNorm();
+        for (int i = 0; i < numVertices; ++i)
+        {
+            m_Vertices.Add(m_AreaVertices[i] - norm*length);
+        }
+
+        for (int i = 1; i < numVertices + 1; ++i)
+        {
+            m_Vertices.AddRange(new Vector3[]{
+                m_Vertices[i % numVertices],
+                m_Vertices[i-1],
+                m_Vertices[i-1+numVertices],
+                m_Vertices[(i % numVertices) + numVertices]
+            });
+        }
+    }
+
     private void UpdateTriangles()
     {
-        for (int i = 0; i < m_Vertices.Count; ++i)
+        int count = m_AreaVertices.Length;
+        for (int i = 0; i < count; ++i)
         {
             if (i < 3)
                 m_Triangles.Add(i);
             else
                 m_Triangles.AddRange(new int[]{i-1, i, 0});
         }
+
+        for (int i = 2*count-1; i >= count; --i)
+        {
+            if (i < count + 3)
+                m_Triangles.Add(i);
+            else
+                m_Triangles.AddRange(new int[]{i, i-1, count});
+        }
+
+        for (int i = 2*count; i < m_Vertices.Count; i+=4)
+        {
+            m_Triangles.AddRange(new int[]{ i, i+1, i+2, i, i+2, i+3 });
+        }
+    }
+
+    public void CreateExtrudedMesh()
+    {
+       
     }
 }
