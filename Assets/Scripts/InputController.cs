@@ -105,9 +105,7 @@ public class InputController : MonoBehaviour
         }
 
         if (drawing == Tool.Mesh)
-        {
-            Debug.Log("drawing Mesh");
-            
+        {            
             // don't need to hold and click to create line
             //currentPosition = m_Pointer.transform.position;
             DrawMesh();
@@ -333,10 +331,11 @@ public class InputController : MonoBehaviour
                             m_MeshCreatorController.CreateMesh();
                             m_MeshCreatorController.DeleteLines();
 
-                            
+                            m_PointerController.isCentered = true;
                         }
                         else
                         {
+                            // new line
                             m_LineCopy = m_MeshCreatorController.AddLine(initialPosition);
                             DrawMesh();
                         }
@@ -416,7 +415,20 @@ public class InputController : MonoBehaviour
     {
         if (m_MeshCopy != null && m_LineCopy != null)
         {
+            if (m_MeshCreatorController.m_Vertices.Count >= 3 && m_PointerController.isCentered)
+            {
+                // current position should be in the same plane as the first 3 vertices
+                m_PointerController.SetPointerPlane(
+                    m_MeshCreatorController.m_Vertices[0] + m_MeshCreatorController.m_PositionOffset,
+                    m_MeshCreatorController.m_Vertices[1] + m_MeshCreatorController.m_PositionOffset,
+                    m_MeshCreatorController.m_Vertices[2] + m_MeshCreatorController.m_PositionOffset
+                );
+
+                m_PointerController.isCentered = false;
+            }
+            
             currentPosition = m_Pointer.transform.position;
+
 
             m_LineCopy.transform.position = (initialPosition + currentPosition) / 2;
             m_LineCopy.transform.localScale = new Vector3(

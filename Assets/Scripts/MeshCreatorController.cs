@@ -5,9 +5,10 @@ using UnityEngine;
 public class MeshCreatorController : MonoBehaviour
 {
     private GameObject m_SubMeshGameObject;
+    private MeshCollider m_SubMeshCollider;
     private Mesh m_Mesh;
     public GameObject m_Line;
-    private Vector3 m_PositionOffset;
+    public Vector3 m_PositionOffset;
     private List<GameObject> m_MeshLines = new List<GameObject>();
     public List<Vector3> m_Vertices = new List<Vector3>();
     public List<int> m_Triangles = new List<int>();
@@ -19,12 +20,21 @@ public class MeshCreatorController : MonoBehaviour
         m_Mesh = new Mesh();
         m_SubMeshGameObject.GetComponent<MeshFilter>().mesh = m_Mesh;
 
+        m_SubMeshCollider = m_SubMeshGameObject.GetComponent<MeshCollider>();
+        m_SubMeshCollider.sharedMesh = m_Mesh;
+
+
         m_Line = transform.Find("Line").gameObject;
     }
 
     public GameObject GetLine(int index)
     {
         return m_MeshLines[index];
+    }
+
+    public List<GameObject> GetLines()
+    {
+        return m_MeshLines;
     }
 
     public GameObject AddLine(Vector3 position)
@@ -69,6 +79,8 @@ public class MeshCreatorController : MonoBehaviour
         mesh2.triangles = triangles2.ToArray();
 
         mesh2.RecalculateNormals();
+
+        m_SubMeshCollider.sharedMesh = mesh2;
 
     }
 

@@ -74,7 +74,8 @@ public class LightUpOnCollision : MonoBehaviour
         InputController.Tool ct = mInputController.m_CurrentTool;
         return (ct == InputController.Tool.Area && gameObject.name.Contains("Line")) ||
             (ct == InputController.Tool.Volume && transform.parent.gameObject.name.Contains("Area")) ||
-            (ct == InputController.Tool.Mesh && transform.parent.parent.gameObject.name.Contains("Mesh"));
+            (ct == InputController.Tool.Mesh && transform.parent.parent.gameObject.name.Contains("Mesh")) ||
+            (ct == InputController.Tool.Volume && gameObject.name.Contains("SubMesh"));
     }
 
 
