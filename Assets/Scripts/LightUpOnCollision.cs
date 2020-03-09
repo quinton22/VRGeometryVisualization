@@ -35,7 +35,7 @@ public class LightUpOnCollision : MonoBehaviour
             }
 
         }
-        else if (enabled && !wasEnabled)
+        else if (Enabled && !wasEnabled)
         {
             wasEnabled = true;
         }

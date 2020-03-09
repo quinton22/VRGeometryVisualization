@@ -19,7 +19,7 @@ public class MeshCreatorController : MonoBehaviour
         // gameObject = transform.Find("SubMesh").gameObject;
 
         m_Mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = m_Mesh;
+        GetComponent<MeshFilter>().sharedMesh = m_Mesh;
 
         m_MeshCollider = GetComponent<MeshCollider>();
         m_MeshCollider.sharedMesh = m_Mesh;
@@ -65,21 +65,30 @@ public class MeshCreatorController : MonoBehaviour
 
         m_AreaVertices = m_Vertices.ToArray();
 
+        m_Mesh.Clear();
         RealUpdateMesh();
+    }
+
+    public void FinishMesh()
+    {
+        Destroy(m_Line);
     }
 
     private void RealUpdateMesh(float length = .001f)
     {
-        m_Mesh.Clear();
+        //m_Mesh.Clear();
+
+        m_Mesh.MarkDynamic();
 
         UpdateVertices(length);
-        UpdateTriangles();      
-
         m_Mesh.vertices = m_Vertices.ToArray();
+
+        UpdateTriangles();
         m_Mesh.triangles = m_Triangles.ToArray();
 
         m_Mesh.Optimize();
         m_Mesh.RecalculateNormals();
+        m_Mesh.RecalculateBounds();
 
         m_MeshCollider.sharedMesh = m_Mesh;
     }
@@ -127,6 +136,7 @@ public class MeshCreatorController : MonoBehaviour
 
     private void UpdateVertices(float length = .001f)
     {
+        // m_Vertices always contains the initial area vertices
         int numVertices = m_AreaVertices.Length;
         Vector3 norm = GetNorm();
         for (int i = 0; i < numVertices; ++i)
@@ -147,6 +157,7 @@ public class MeshCreatorController : MonoBehaviour
 
     private void UpdateTriangles()
     {
+        m_Triangles.Clear();
         int count = m_AreaVertices.Length;
         for (int i = 0; i < count; ++i)
         {

@@ -177,7 +177,6 @@ public class InputController : MonoBehaviour
                     else if (m_PointerController.collidingObject.transform.name.Contains("Mesh"))
                     {
                         // start extruding mesh
-                        Debug.Log("extrude mesh");
                         m_MeshForVolume = m_PointerController.collidingObject;
                         drawing = Tool.Volume;
                         initialPosition = m_MeshForVolume.transform.position;
@@ -326,6 +325,8 @@ public class InputController : MonoBehaviour
                     {
                         m_MeshForVolume.GetComponent<LightUpOnCollision>().SetEnabled(false);
                         m_MeshForVolume = null;
+                        m_MeshCreatorController.FinishMesh();
+                        m_PointerController.collidingObject = null;
                     }
                     break;
                 case Tool.Mesh:
