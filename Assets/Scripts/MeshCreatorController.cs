@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// MeshCreatorController
+// Controls the creation of a mesh, from drawing lines to filling in triangles
 public class MeshCreatorController : MonoBehaviour
 {
     private Mesh m_Mesh;
@@ -13,6 +15,8 @@ public class MeshCreatorController : MonoBehaviour
     private List<GameObject> m_MeshLines = new List<GameObject>();
     public List<Vector3> m_Vertices = new List<Vector3>();
     public List<int> m_Triangles = new List<int>();
+    [System.NonSerialized]
+    public bool m_SnapToGrid = true;
 
     void Start()
     {
@@ -26,6 +30,8 @@ public class MeshCreatorController : MonoBehaviour
 
 
         m_Line = transform.Find("Line").gameObject;
+
+        Debug.Log(m_SnapToGrid);
     }
 
     public GameObject GetLine(int index)

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// SphereScaleController
+// controls the scale of the sphere attached to the line of a mesh
 public class SphereScaleController : MonoBehaviour
 {
     private float scale = .1f;

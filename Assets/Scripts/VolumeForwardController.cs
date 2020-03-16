@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// VolumeForwardController
+// Determines the forward direction of a volume and allows for access by other scripts
 public class VolumeForwardController : MonoBehaviour
 {
     public Vector3 ZDirection;

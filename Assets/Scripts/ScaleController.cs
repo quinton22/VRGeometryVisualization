@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+// ScaleController
+// Controls the grid and scale shown for each mesh/line/volume
 public class ScaleController : MonoBehaviour
 {
     private GameObject m_Parent;
@@ -49,6 +51,13 @@ public class ScaleController : MonoBehaviour
                 SetInitial();
 
                 Debug.Log($"{gameObject.name}");
+            }
+            else if (m_Parent.name.Contains("Mesh"))
+            {
+                m_ScaleDim = "";
+                m_OriginalImage = transform.Find("Image (Horz)").gameObject;
+                m_CrossAxisOriginalImage = transform.Find("Image (Vert)").gameObject;
+                CreateGridForMesh();
             }
             UpdateSpecific = SpecificUpdate;
         }
@@ -267,5 +276,10 @@ public class ScaleController : MonoBehaviour
                 m_VolumeForwardController.rotated.Clear();
             }
         }
+    }
+
+    void CreateGridForMesh()
+    {
+        
     }
 }

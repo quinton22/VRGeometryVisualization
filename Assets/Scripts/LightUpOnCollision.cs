@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// LightUpOnCollision
+// Controls whether or not a shape lights up on collision
 public class LightUpOnCollision : MonoBehaviour
 {
 

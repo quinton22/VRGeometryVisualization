@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// PointerController
+// Controls the location of the center pointer
 public class PointerController : MonoBehaviour
 {
 

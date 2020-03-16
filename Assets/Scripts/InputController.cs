@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+
+// InputController class
+// Controls the tools and geometry manipulation given user input
 public class InputController : MonoBehaviour
 {
     public enum Tool
@@ -232,7 +235,7 @@ public class InputController : MonoBehaviour
         // finish drawing
         if (drawing != Tool.None || m_CurrentTool == Tool.Mesh)
         {
-            if (m_CurrentTool != Tool.Mesh)
+            if (m_CurrentTool != Tool.Mesh && (m_CurrentTool != Tool.Volume || m_MeshForVolume == null))
             {
                 drawing = Tool.None;
 
@@ -324,9 +327,18 @@ public class InputController : MonoBehaviour
                     else if (m_MeshForVolume != null)
                     {
                         m_MeshForVolume.GetComponent<LightUpOnCollision>().SetEnabled(false);
+
+                        if (m_MeshCreatorController.m_SnapToGrid)
+                        {
+                            DrawVolume(true);
+                        }
+
                         m_MeshForVolume = null;
                         m_MeshCreatorController.FinishMesh();
                         m_PointerController.collidingObject = null;
+                        currentPosition = Vector3.zero;
+                        initialPosition = Vector3.zero;
+
                     }
                     break;
                 case Tool.Mesh:
@@ -343,8 +355,18 @@ public class InputController : MonoBehaviour
                     else
                     {
                         // want to end current line and start new line unless we are back at the starting position
-                        // TODO: rescale to some subunit based on line length or 2D grid
-                        initialPosition = m_Pointer.transform.position;
+                        Debug.Log(m_MeshCreatorController.m_SnapToGrid);
+                        // if m_MeshCreatorController.m_SnapToGrid is true, then the line should snap to a whole number plus the initial pos
+                        if (m_MeshCreatorController.m_SnapToGrid)
+                        {
+                            // last currentPosition should snap to the first initial position plus or minus a whole number
+                            DrawMesh(true);
+                            initialPosition = currentPosition;
+                        }
+                        else
+                        {
+                            initialPosition = m_Pointer.transform.position;
+                        }
 
                         GameObject originalLine = m_MeshCreatorController.GetLine(0);
                         if (originalLine.transform.Find("Sphere").gameObject.GetComponent<LightUpOnCollision>().collision)
@@ -415,7 +437,7 @@ public class InputController : MonoBehaviour
         }
     }
     
-    void DrawVolume()
+    void DrawVolume(bool snapToGrid=false)
     {
         if (m_VolumeCopy != null)
         {
@@ -436,11 +458,27 @@ public class InputController : MonoBehaviour
         }
         else if (m_MeshForVolume != null)
         {
-            m_MeshCreatorController.UpdateMesh(Vector3.Project((currentPosition - initialPosition), m_MeshCreatorController.GetNorm()));
+            Vector3 updatedValue = Vector3.Project((currentPosition - initialPosition), m_MeshCreatorController.GetNorm());
+            if (snapToGrid)
+            {
+                float scale = 2; // TODO: change
+                updatedValue *= scale;
+                Vector3 updatedValue2 = new Vector3(Mathf.Round(updatedValue.x), Mathf.Round(updatedValue.y), Mathf.Round(updatedValue.z));
+
+                if (updatedValue2.magnitude == 0)
+                    updatedValue = updatedValue.normalized;
+                else
+                    updatedValue = updatedValue2;
+
+                updatedValue /= scale;
+            }
+            
+            m_MeshCreatorController.UpdateMesh(updatedValue);
+            
         }
     }
 
-    void DrawMesh()
+    void DrawMesh(bool snapToGrid=false)
     {
         if (m_MeshCopy != null && m_LineCopy != null)
         {
@@ -456,14 +494,62 @@ public class InputController : MonoBehaviour
                 m_PointerController.isCentered = false;
             }
             
-            currentPosition = m_Pointer.transform.position;
+            if (!snapToGrid)
+            {
+                currentPosition = m_Pointer.transform.position;
+            }
+            else if (!m_PointerController.isCentered)
+            {
+                // TODO: this is buggy and is not always in a plane
+                // TODO: needs to be some scale here so as not to round to whole numbers (divided by 2)
+                float scale = 2;
 
+                // currentPosition should update to a rounded number based on the m_PositionOffset
+                currentPosition = m_Pointer.transform.position - m_MeshCreatorController.m_PositionOffset;
+
+                currentPosition *= scale;
+                currentPosition = new Vector3(Mathf.Round(currentPosition.x), Mathf.Round(currentPosition.y), Mathf.Round(currentPosition.z));
+                currentPosition /= scale;
+                currentPosition += m_MeshCreatorController.m_PositionOffset;
+            }
 
             m_LineCopy.transform.position = (initialPosition + currentPosition) / 2;
             m_LineCopy.transform.localScale = new Vector3(
                 m_LineCopy.transform.localScale.x,
                 (initialPosition - currentPosition).magnitude / 2,
-                m_LineCopy.transform.localScale.z);
+                m_LineCopy.transform.localScale.z
+            );
+
+            if (snapToGrid && m_PointerController.isCentered)
+            {
+                float sd = m_ScaleDivision * 2;
+                // round to nearest (sub)unit
+                Vector3 scaleL = m_LineCopy.transform.localScale;
+                scaleL.y *= sd;
+                if (scaleL.y < 1)
+                {
+                    scaleL.y = 1;
+                }
+                else
+                {
+                    scaleL.y = Mathf.Round(scaleL.y);
+                }
+                scaleL.y /= sd;
+
+                float deltaY = scaleL.y - m_LineCopy.transform.localScale.y;
+
+                m_LineCopy.transform.localScale = scaleL;
+
+                // move position to adjust for change of size
+                Vector3 posL = m_LineCopy.transform.position;
+                posL += m_LineCopy.transform.up * deltaY;
+                m_LineCopy.transform.position = posL;
+
+                currentPosition = m_LineCopy.transform.position + m_LineCopy.transform.up * m_LineCopy.transform.localScale.y;
+
+            }
+
+
             m_LineCopy.transform.localRotation = Quaternion.LookRotation((currentPosition - initialPosition).normalized);
             m_LineCopy.transform.Rotate(90, 0, 0);
         }
