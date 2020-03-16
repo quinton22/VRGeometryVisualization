@@ -500,6 +500,7 @@ public class InputController : MonoBehaviour
             }
             else if (!m_PointerController.isCentered)
             {
+                // TODO: make sure mesh is convex
                 // TODO: this is buggy and is not always in a plane
                 // TODO: needs to be some scale here so as not to round to whole numbers (divided by 2)
                 float scale = 2;
