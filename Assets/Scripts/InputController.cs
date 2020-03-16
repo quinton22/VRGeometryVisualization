@@ -498,20 +498,13 @@ public class InputController : MonoBehaviour
             {
                 currentPosition = m_Pointer.transform.position;
             }
-            else if (!m_PointerController.isCentered)
+            else if (!m_PointerController.isCentered) // snapping to the grid and not one of the first 3 points
             {
                 // TODO: make sure mesh is convex
-                // TODO: this is buggy and is not always in a plane
                 // TODO: needs to be some scale here so as not to round to whole numbers (divided by 2)
                 float scale = 2;
 
-                // currentPosition should update to a rounded number based on the m_PositionOffset
-                currentPosition = m_Pointer.transform.position - m_MeshCreatorController.m_PositionOffset;
-
-                currentPosition *= scale;
-                currentPosition = new Vector3(Mathf.Round(currentPosition.x), Mathf.Round(currentPosition.y), Mathf.Round(currentPosition.z));
-                currentPosition /= scale;
-                currentPosition += m_MeshCreatorController.m_PositionOffset;
+                currentPosition = m_PointerController.GetGridPointFromPlane(m_Pointer.transform.position, scale);
             }
 
             m_LineCopy.transform.position = (initialPosition + currentPosition) / 2;
