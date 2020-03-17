@@ -15,6 +15,10 @@ public class PointerController : MonoBehaviour
     private Vector3 PointerPlaneYAxis;
     private Vector3 PointerPlaneOrigin;
     private Vector3 m_InitialLocalPosition;
+    private bool RestrictToInsideRays = false;
+    private Vector3 RayOrigin;
+    private Vector3 Dir1;
+    private Vector3 Dir2;
     
     // Start is called before the first frame update
     void Start()
@@ -27,7 +31,46 @@ public class PointerController : MonoBehaviour
     {
         if (!isCentered)
         {
-            transform.position = PointerPlane.ClosestPointOnPlane(transform.parent.TransformPoint(m_InitialLocalPosition));
+            Vector3 centerPoint = transform.parent.TransformPoint(m_InitialLocalPosition);
+
+            centerPoint = PointerPlane.ClosestPointOnPlane(centerPoint);
+            
+            transform.position = centerPoint;
+
+            if (RestrictToInsideRays)
+            {
+                Vector3 dir3 = (centerPoint - RayOrigin).normalized;
+
+                if (!(Vector3.Dot(Vector3.Cross(Dir1, dir3), Vector3.Cross(Dir1, Dir2)) >= 0
+                    && Vector3.Dot(Vector3.Cross(Dir2, dir3), Vector3.Cross(Dir2, Dir1)) >= 0))
+                {
+                    // C is not inside A and B
+                    Vector3 potentialPoint1 = RayOrigin + Dir1 * Vector3.Dot(Dir1, centerPoint - RayOrigin);
+                    Vector3 potentialPoint2 = RayOrigin + Dir2 * Vector3.Dot(Dir2, centerPoint - RayOrigin);
+
+                    bool A = ((potentialPoint1 - RayOrigin).normalized - Dir1).magnitude < 0.0001f;
+                    bool B = ((potentialPoint2 - RayOrigin).normalized - Dir2).magnitude < 0.0001f;
+
+                    if (A && B)
+                    {
+                        transform.position = (potentialPoint1 - centerPoint).magnitude < (potentialPoint2 - centerPoint).magnitude
+                            ? potentialPoint1
+                            : potentialPoint2;
+                    }
+                    else if (A)
+                    {
+                        transform.position = potentialPoint1;
+                    }
+                    else if (B)
+                    {
+                        transform.position = potentialPoint2;
+                    }
+                    else
+                    {
+                        transform.position = RayOrigin;
+                    }                    
+                }
+            }
 
             if (wasCentered)
                 wasCentered = false;
@@ -74,5 +117,18 @@ public class PointerController : MonoBehaviour
         }
         
         throw new UnassignedReferenceException("PointerPlane is not set.");
+    }
+
+    public void RestrictPointerToInsideRays(Vector3 origin, Vector3 dir1, Vector3 dir2)
+    {
+        RestrictToInsideRays = true;
+        RayOrigin = origin;
+        Dir1 = dir1.normalized;
+        Dir2 = dir2.normalized;
+    }
+
+    public void UnrestrictPointerToInsideRays()
+    {
+        RestrictToInsideRays = false;
     }
 }

@@ -378,6 +378,7 @@ public class InputController : MonoBehaviour
                             m_MeshCreatorController.CreateMesh();
                             m_MeshCreatorController.DeleteLines();
 
+                            m_PointerController.UnrestrictPointerToInsideRays();
                             m_PointerController.isCentered = true;
                         }
                         else
@@ -486,9 +487,9 @@ public class InputController : MonoBehaviour
             {
                 // current position should be in the same plane as the first 3 vertices
                 m_PointerController.SetPointerPlane(
-                    m_MeshCreatorController.m_Vertices[0] + m_MeshCreatorController.m_PositionOffset,
-                    m_MeshCreatorController.m_Vertices[1] + m_MeshCreatorController.m_PositionOffset,
-                    m_MeshCreatorController.m_Vertices[2] + m_MeshCreatorController.m_PositionOffset
+                    m_MeshCreatorController.GetVertexWithWorldCoord(0),
+                    m_MeshCreatorController.GetVertexWithWorldCoord(1),
+                    m_MeshCreatorController.GetVertexWithWorldCoord(2)
                 );
 
                 m_PointerController.isCentered = false;
@@ -500,11 +501,28 @@ public class InputController : MonoBehaviour
             }
             else if (!m_PointerController.isCentered) // snapping to the grid and not one of the first 3 points
             {
-                // TODO: make sure mesh is convex
                 // TODO: needs to be some scale here so as not to round to whole numbers (divided by 2)
                 float scale = 2;
 
                 currentPosition = m_PointerController.GetGridPointFromPlane(m_Pointer.transform.position, scale);
+            }
+
+            if (!m_PointerController.isCentered)
+            {
+                // make sure mesh is convex
+                // by ensuring that the pointer is within the ray created by the 2nd to last vertex
+                // and the last vertex and the ray created by the last vertex and the first vertex
+                int count = m_MeshCreatorController.m_Vertices.Count;
+                Vector3 vertexN = m_MeshCreatorController.GetVertexWithWorldCoord(count-1);
+                Vector3 vertexNMinus1 = m_MeshCreatorController.GetVertexWithWorldCoord(count-2);
+                Vector3 vertex1 = m_MeshCreatorController.GetVertexWithWorldCoord(0);
+
+
+                Vector3 A = vertexN - vertexNMinus1;
+                Vector3 B = vertex1 - vertexN;
+
+                m_PointerController.RestrictPointerToInsideRays(vertexN, A, B);
+
             }
 
             m_LineCopy.transform.position = (initialPosition + currentPosition) / 2;

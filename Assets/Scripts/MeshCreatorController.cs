@@ -34,6 +34,11 @@ public class MeshCreatorController : MonoBehaviour
         Debug.Log(m_SnapToGrid);
     }
 
+    public Vector3 GetVertexWithWorldCoord(int index)
+    {
+        return m_Vertices[index] + m_PositionOffset;
+    }
+
     public GameObject GetLine(int index)
     {
         return m_MeshLines[index];
