@@ -387,14 +387,7 @@ public class InputController : MonoBehaviour
                             m_LineCopy = m_MeshCreatorController.AddLine(initialPosition);
                             DrawMesh();
                         }
-
-          
-                        //TODO: if new line intersects sphere of first line then finish then call a fxn that creates the mesh
-                        // mesh.create()
-
-                        
                     }
-                    // TODO
                     break;
                 case Tool.None:
                 default:
@@ -506,6 +499,21 @@ public class InputController : MonoBehaviour
 
                 currentPosition = m_PointerController.GetGridPointFromPlane(m_Pointer.transform.position, scale);
             }
+            else if (m_PointerController.isCentered && m_MeshCreatorController.m_Vertices.Count == 2)
+            {
+                // TODO: needs to be some scale here so as not to round to whole numbers (divided by 2)
+                float scale = 2;
+
+                m_PointerController.SetPointerPlane(
+                    m_MeshCreatorController.GetVertexWithWorldCoord(0),
+                    m_MeshCreatorController.GetVertexWithWorldCoord(1),
+                    currentPosition
+                );
+
+                m_PointerController.isCentered = false;
+
+                currentPosition = m_PointerController.GetGridPointFromPlane(m_Pointer.transform.position, scale);
+            }
 
             if (!m_PointerController.isCentered)
             {
@@ -561,7 +569,7 @@ public class InputController : MonoBehaviour
 
             }
 
-
+            if (currentPosition - initialPosition == Vector3.zero) return;
             m_LineCopy.transform.localRotation = Quaternion.LookRotation((currentPosition - initialPosition).normalized);
             m_LineCopy.transform.Rotate(90, 0, 0);
         }

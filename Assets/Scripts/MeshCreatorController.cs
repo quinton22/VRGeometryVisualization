@@ -17,6 +17,8 @@ public class MeshCreatorController : MonoBehaviour
     public List<int> m_Triangles = new List<int>();
     [System.NonSerialized]
     public bool m_SnapToGrid = true;
+    [System.NonSerialized]
+    public bool Finished = false;
 
     void Start()
     {
@@ -30,8 +32,6 @@ public class MeshCreatorController : MonoBehaviour
 
 
         m_Line = transform.Find("Line").gameObject;
-
-        Debug.Log(m_SnapToGrid);
     }
 
     public Vector3 GetVertexWithWorldCoord(int index)
@@ -78,6 +78,8 @@ public class MeshCreatorController : MonoBehaviour
 
         m_Mesh.Clear();
         RealUpdateMesh();
+        Finished = true;
+
     }
 
     public void FinishMesh()
