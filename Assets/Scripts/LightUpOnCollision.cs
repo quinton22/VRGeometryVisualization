@@ -13,7 +13,6 @@ public class LightUpOnCollision : MonoBehaviour
     public bool wasEnabled = true;
     public MeshRenderer m_MeshRenderer;
     public Material m_Mat;
-    // Start is called before the first frame update
     void Start()
     {
         mInputController = GameObject.Find("ToolController").GetComponent<InputController>();
@@ -23,7 +22,6 @@ public class LightUpOnCollision : MonoBehaviour
         collision = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!Enabled && wasEnabled)
@@ -56,7 +54,7 @@ public class LightUpOnCollision : MonoBehaviour
         {
             bool enabled = m_Mat.IsKeywordEnabled("_EMISSION");
 
-            if (m_Mat.GetFloat("_Mode") == 2)
+            if (m_Mat.GetFloat("_Mode") == 2) // fade shader
             {
                 m_Mat.color = Color.white;
             }
@@ -98,7 +96,8 @@ public class LightUpOnCollision : MonoBehaviour
     bool checkCurrentTool()
     {
         InputController.Tool ct = mInputController.m_CurrentTool;
-        return (ct == InputController.Tool.Area && gameObject.name.Contains("Line")) ||
+        return (ct == InputController.Tool.None) ||
+            (ct == InputController.Tool.Area && gameObject.name.Contains("Line")) ||
             (ct == InputController.Tool.Volume && transform.parent.gameObject.name.Contains("Area")) ||
             (ct == InputController.Tool.Volume && gameObject.name.Contains("Mesh")) ||
             (ct == InputController.Tool.Mesh && gameObject.name.Contains("Sphere"));
