@@ -22,4 +22,4 @@ The goal is to help young students better visualize geometry. From dimensionalit
 5. Separate volumes and add volumes
 
 ## How to Use
-Currently unfinished
+Currently unfinished. To use, either clone or download the repository. Open using Unity 2019.3.7f1. Find the "MainScene" in the "Scenes" folder in the project hierarchy. The MainScene will contain a playable 3D version of the tool. Currently being added is "MainSceneVR" which will be the VR version. If you wish to run the app using VR, contact me about the Oculus application ID.
