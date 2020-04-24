@@ -6,15 +6,21 @@ using Valve.VR.InteractionSystem;
 
 public class PenInputController : MonoBehaviour
 {
+    public InputController m_InputController;
     public SteamVR_Action_Boolean m_DrawAction;
     private Interactable interactable;
-    // Start is called before the first frame update
+    private bool isTriggerDown = false;
+    private FixedJoint fixedJoint;
+    private Vector3 anchor;
+    private bool isJointAttached = false;
+
     void Start()
     {
         interactable = GetComponent<Interactable>();
+        fixedJoint = GetComponent<FixedJoint>();
+        anchor = transform.Find("AttachPoint").localPosition;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (interactable.attachedToHand != null)
@@ -23,22 +29,61 @@ public class PenInputController : MonoBehaviour
             
             if (m_DrawAction[source].stateDown) // trigger down
             {
-                Draw();
+                if (!isTriggerDown)
+                    StartDraw();
+                else
+                    Drawing();
             }
-            else if (m_DrawAction[source].stateDown) // trigger hold
+            else if (m_DrawAction[source].stateUp) // trigger up
             {
-                
-            }
-            else if (m_DrawAction[source].stateDown) // trigger up
-            {
-
+                StopDraw();
             }
        
         }
+
+        if (isJointAttached && fixedJoint.connectedBody == null)
+        {
+            isJointAttached = false;
+            m_InputController.SetTool(InputController.Tool.None);
+        }
     }
 
-    void Draw()
+    void OnTriggerEnter(Collider other)
     {
-        
+        if (fixedJoint.connectedBody == null) return;
+
+        string name = other.gameObject.name.ToLower();
+        if (name.Contains("line") || name.Contains("area") || name.Contains("cube") || name.Contains("mesh"))
+        {
+            fixedJoint.connectedBody = other.attachedRigidbody;
+            fixedJoint.anchor = anchor;
+            isJointAttached = true;
+
+            if (name.Contains("line"))
+                m_InputController.SetTool(InputController.Tool.Line);
+            else if (name.Contains("area"))
+                m_InputController.SetTool(InputController.Tool.Area);
+            else if (name.Contains("cube"))
+                m_InputController.SetTool(InputController.Tool.Volume);
+            else if (name.Contains("mesh"))
+                m_InputController.SetTool(InputController.Tool.Mesh);
+        }
+    }
+
+    void StartDraw()
+    {
+        isTriggerDown = true;
+        m_InputController.Clicked();
+    }
+
+    void Drawing()
+    {
+        m_InputController.Dragged();
+    }
+
+    void StopDraw()
+    {
+        isTriggerDown = false;
+        m_InputController.MouseUp();
     }
 }

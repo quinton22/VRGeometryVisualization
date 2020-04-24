@@ -116,6 +116,11 @@ public class InputController : MonoBehaviour
         }
     }
 
+    public void SetTool(Tool tool)
+    {
+        m_CurrentTool = tool;
+    }
+
     /// Takes the current tool (mCurrentTool) and sets the tool text
     /// to represent that tool
     void SetToolText()
@@ -145,7 +150,7 @@ public class InputController : MonoBehaviour
         }
     }
 
-    void Clicked() 
+    public void Clicked() 
     {
         // initialize a move
         switch(m_CurrentTool)
@@ -204,7 +209,7 @@ public class InputController : MonoBehaviour
         }
     }
 
-    void Dragged()
+    public void Dragged()
     {
         // drag out
         switch (m_CurrentTool)
@@ -230,7 +235,7 @@ public class InputController : MonoBehaviour
         }
     }
 
-    void MouseUp()
+    public void MouseUp()
     {
         // finish drawing
         if (drawing != Tool.None || m_CurrentTool == Tool.Mesh)
