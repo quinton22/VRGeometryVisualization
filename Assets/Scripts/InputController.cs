@@ -46,7 +46,7 @@ public class InputController : MonoBehaviour
     void Start()
     {
         m_CurrentTool = Tool.None;
-        m_ToolText = GameObject.Find("ActiveToolText").GetComponent<Text>();
+//        m_ToolText = GameObject.Find("ActiveToolText").GetComponent<Text>();
 
         m_Line = m_Shape.transform.Find("Line").gameObject;
         m_Area = m_Shape.transform.Find("Area").gameObject;
