@@ -33,7 +33,7 @@ public class PointerController : MonoBehaviour
     {
         if (!isCentered)
         {
-            Vector3 centerPoint = transform.parent.TransformPoint(m_InitialLocalPosition);
+            Vector3 centerPoint = transform.parent.TransformPoint(m_InitialLocalPosition); // TODO: fix
 
             centerPoint = PointerPlane.ClosestPointOnPlane(centerPoint);
             
