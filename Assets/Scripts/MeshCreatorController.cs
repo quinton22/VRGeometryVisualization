@@ -113,6 +113,8 @@ public class MeshCreatorController : MonoBehaviour
     {
         float m = (dir.normalized - GetNorm()).magnitude;
 
+        Debug.Log($"magnitude: {m}"); // TODO: sometimes the last one is getting a kindof high magnitude instead of 0
+
         float update = dir.magnitude;
 
         if (m > .00001) // same direction as norm

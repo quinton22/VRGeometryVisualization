@@ -21,19 +21,34 @@ public class PointerController : MonoBehaviour
     private Vector3 RayOrigin;
     private Vector3 Dir1;
     private Vector3 Dir2;
+
+    [Header("Scale Pointer")]
+    [SerializeField]
+    [Tooltip("Time, in seconds, it takes pointer to scale up when drawing")]
+    private float m_ScaleTime = 1;
+    [SerializeField]
+    [Tooltip("Maximum times the initial scale that the pointer increases")]
+    private float m_MaxScale = 10;
+    private float initialScale;
+    private int scaleDirection = 0; // -1 for decreasing, 0 for no change, 1 for incr
+    private float currentScaleTime = 0;
+    [SerializeField]
+    [Tooltip("Scale of pointer increases the farther you are away")]
+    private bool m_ScaleIncreaseWithDistance = false;
     
     // Start is called before the first frame update
     void Start()
     {
         m_InitialLocalPosition = transform.localPosition;
+        initialScale = transform.localScale.x;
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         if (!isCentered)
         {
-            Vector3 centerPoint = transform.parent.TransformPoint(m_InitialLocalPosition); // TODO: fix
+            Vector3 centerPoint = transform.parent.TransformPoint(m_InitialLocalPosition);
 
             centerPoint = PointerPlane.ClosestPointOnPlane(centerPoint);
             
@@ -81,6 +96,25 @@ public class PointerController : MonoBehaviour
         {
             transform.localPosition = m_InitialLocalPosition;
             wasCentered = true;
+        }
+
+        if (scaleDirection != 0)
+        {
+            currentScaleTime += scaleDirection * Time.deltaTime;
+            if (currentScaleTime > m_ScaleTime) 
+            {
+                currentScaleTime = m_ScaleTime;
+                scaleDirection = 0;
+            }
+            else if (currentScaleTime < 0)
+            {
+                currentScaleTime = 0;
+                scaleDirection = 0;
+            }
+
+            float distanceScale = m_ScaleIncreaseWithDistance ? (!isCentered ? Mathf.Lerp(1, 3, transform.localPosition.magnitude / 3) : 1) : 1;
+            transform.localScale = distanceScale * (new Vector3(initialScale, initialScale, initialScale))
+                    * Mathf.Lerp(initialScale, initialScale * m_MaxScale, currentScaleTime / m_ScaleTime);
         }
     }
 
@@ -132,5 +166,15 @@ public class PointerController : MonoBehaviour
     public void UnrestrictPointerToInsideRays()
     {
         RestrictToInsideRays = false;
+    }
+
+    public void IncreaseSizeOfPointer()
+    {
+        scaleDirection = 1;
+    }
+
+    public void DecreaseSizeOfPointer()
+    {
+        scaleDirection = -1;
     }
 }

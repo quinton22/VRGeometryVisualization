@@ -38,6 +38,8 @@ public class PenInputController : MonoBehaviour
             Drawing();
         }
 
+        // TODO: somehow finish mesh
+
         if (interactable.attachedToHand != null)
         {
             if (!shownChangeToolHint)
@@ -86,6 +88,8 @@ public class PenInputController : MonoBehaviour
     public void ButtonDown(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
     {
         if (interactable.attachedToHand == null) return;
+
+        if (m_InputController.drawing != InputController.Tool.None) return; // don't switch tools if drawing
 
         if (!shownChangeToolHint)
         {

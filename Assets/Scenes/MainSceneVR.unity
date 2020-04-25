@@ -5914,6 +5914,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48f394a10f625bd46b3e0f96366f10b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_ScaleTime: 0.2
+  m_MaxScale: 5
+  m_ScaleIncreaseWithDistance: 1
 --- !u!64 &1714393598
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -7160,6 +7163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ScaleDivision: 2
+  drawing: 0
   m_Shape: {fileID: 1446874966}
   m_Parent: {fileID: 1764839644}
   m_Pointer: {fileID: 1714393592}

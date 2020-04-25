@@ -10,11 +10,16 @@ public class SphereScaleController : MonoBehaviour
 
     void Update()
     {
+        Vector3 s = transform.localScale;
         if (transform.parent.localScale.y != 0)
         {
-            Vector3 s = transform.localScale;
             s.y = scale / transform.parent.localScale.y;
-            transform.localScale = s;
         }
+        else
+        {
+            s.y = 0;
+        }
+        transform.localScale = s;
+
     }
 }
