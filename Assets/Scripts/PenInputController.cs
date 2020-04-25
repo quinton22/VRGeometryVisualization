@@ -89,6 +89,8 @@ public class PenInputController : MonoBehaviour
     {
         if (interactable.attachedToHand == null) return;
 
+        if (interactable.attachedToHand.handType != fromSource) return; // if not the same hand, don't do anything
+
         if (m_InputController.drawing != InputController.Tool.None) return; // don't switch tools if drawing
 
         if (!shownChangeToolHint)

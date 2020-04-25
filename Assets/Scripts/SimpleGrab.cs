@@ -5,7 +5,10 @@ using Valve.VR;
 using Valve.VR.InteractionSystem;
 public class SimpleGrab : MonoBehaviour
 {
+    public bool ShowHint = false;
     private Interactable interactable;
+    [EnumFlags]
+    public Hand.AttachmentFlags attachmentFlags = Hand.AttachmentFlags.ParentToHand | Hand.AttachmentFlags.DetachFromOtherHand | Hand.AttachmentFlags.TurnOnKinematic;
 
     void Start()
     {
@@ -14,12 +17,14 @@ public class SimpleGrab : MonoBehaviour
 
     private void OnHandHoverBegin(Hand hand)
     {
-        hand.ShowGrabHint();
+        if (ShowHint)
+            hand.ShowGrabHint();
     }
 
     private void OnHandHoverEnd(Hand hand)
     {
-        hand.HideGrabHint();
+        if (ShowHint)
+            hand.HideGrabHint();
     }
 
     private void HandHoverUpdate(Hand hand)
@@ -29,7 +34,7 @@ public class SimpleGrab : MonoBehaviour
 
         if (interactable.attachedToHand == null && grabType != GrabTypes.None)
         {
-            hand.AttachObject(gameObject, grabType);
+            hand.AttachObject(gameObject, grabType, attachmentFlags);
             hand.HoverLock(interactable);
             hand.HideGrabHint();
         }
