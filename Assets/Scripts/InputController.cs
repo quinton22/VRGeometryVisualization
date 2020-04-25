@@ -17,6 +17,7 @@ public class InputController : MonoBehaviour
         Mesh
     }
 
+    [System.NonSerialized]
     public Tool m_CurrentTool;
     // what to divide 1 unit up into
     public float m_ScaleDivision = 2;
@@ -59,54 +60,54 @@ public class InputController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("l"))
-        {
-            // line tool
-            m_CurrentTool = Tool.Line;
+        // if (Input.GetKeyDown("l"))
+        // {
+        //     // line tool
+        //     m_CurrentTool = Tool.Line;
 
-            // opt to call SetToolText() here to mitigate the number of times
-            // we update the text field
-            SetToolText();
-        }
-        else if (Input.GetKeyDown("r"))
-        {
-            // area tool
-            m_CurrentTool = Tool.Area;
-            SetToolText();
-        }
-        else if (Input.GetKeyDown("v"))
-        {
-            // volume tool
-            m_CurrentTool = Tool.Volume;
-            SetToolText();
-        }
-        else if (Input.GetKeyDown("m"))
-        {
-            // mesh tool
-            m_CurrentTool = Tool.Mesh;
-            SetToolText();
-        }
-        else if (Input.GetKeyDown("n"))
-        {
-            // none
-            m_CurrentTool = Tool.None;
-            SetToolText();
-        }
+        //     // opt to call SetToolText() here to mitigate the number of times
+        //     // we update the text field
+        //     SetToolText();
+        // }
+        // else if (Input.GetKeyDown("r"))
+        // {
+        //     // area tool
+        //     m_CurrentTool = Tool.Area;
+        //     SetToolText();
+        // }
+        // else if (Input.GetKeyDown("v"))
+        // {
+        //     // volume tool
+        //     m_CurrentTool = Tool.Volume;
+        //     SetToolText();
+        // }
+        // else if (Input.GetKeyDown("m"))
+        // {
+        //     // mesh tool
+        //     m_CurrentTool = Tool.Mesh;
+        //     SetToolText();
+        // }
+        // else if (Input.GetKeyDown("n"))
+        // {
+        //     // none
+        //     m_CurrentTool = Tool.None;
+        //     SetToolText();
+        // }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Clicked();
-        }
+        // if (Input.GetMouseButtonDown(0))
+        // {
+        //     Clicked();
+        // }
 
-        if (Input.GetMouseButton(0))
-        {
-            Dragged();
-        }
+        // if (Input.GetMouseButton(0))
+        // {
+        //     Dragged();
+        // }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            MouseUp();
-        }
+        // if (Input.GetMouseButtonUp(0))
+        // {
+        //     MouseUp();
+        // }
 
         if (drawing == Tool.Mesh)
         {            

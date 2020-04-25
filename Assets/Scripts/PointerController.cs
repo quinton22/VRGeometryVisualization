@@ -6,9 +6,11 @@ using UnityEngine;
 // Controls the location of the center pointer
 public class PointerController : MonoBehaviour
 {
-
+    [System.NonSerialized]
     public GameObject collidingObject;
+    [System.NonSerialized]
     public bool isCentered = true;
+    [System.NonSerialized]
     public bool wasCentered = true;
     private Plane PointerPlane;
     private Vector3 PointerPlaneXAxis;

@@ -23,6 +23,7 @@ public class ScaleController : MonoBehaviour
     private VolumeForwardController m_VolumeForwardController;
     private MeshCreatorController m_MeshCreator;
     [SerializeField]
+    [Tooltip("Only need on children of Mesh object")]
     private GameObject m_Pointer;
     private PointerController m_PointerController;
 

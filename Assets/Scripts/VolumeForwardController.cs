@@ -6,11 +6,14 @@ using UnityEngine;
 // Determines the forward direction of a volume and allows for access by other scripts
 public class VolumeForwardController : MonoBehaviour
 {
+    [System.NonSerialized]
     public Vector3 ZDirection;
+    [System.NonSerialized]
     public Vector3 dir;
-
+    [System.NonSerialized]
     public float result;
-    public List<string> rotated = new List<string>();
+    [System.NonSerialized]
+    public List<string> rotated = new List<string>(); // TODO: remove?
 
     public float Result()
     {

@@ -7,156 +7,148 @@ using Valve.VR.InteractionSystem;
 public class PenInputController : MonoBehaviour
 {
     public InputController m_InputController;
-    public SteamVR_Action_Boolean m_DrawAction;
+    public SteamVR_Action_Boolean m_DrawAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("Draw");
+    public SteamVR_Action_Boolean m_SwitchToolAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("SwitchTool");
     private Interactable interactable;
     private bool isTriggerDown = false;
-    private FixedJoint fixedJoint;
-    private Transform anchorTransform;
-    //public bool isJointAttached = false;
-    [SerializeField]
-    [Tooltip("How long the collider takes to flash in seconds")]
-    private float m_TotalLightUpCycleTime;
-    private float currentCycleTime = 0;
-    [SerializeField]
-    private GameObject lightUpCollider;
-    private Material lightUpColliderMaterial;
-    private Rigidbody rigidbody;
-    [SerializeField]
-    private float m_BreakForce = Mathf.Infinity;
-
+    private Transform attachments;
+    private int currentAttachment = -1;
+    private bool shownDrawHint = false;
+    private bool shownChangeToolHint = false;
+    private Hand hintHand;
     void Start()
     {
         interactable = GetComponent<Interactable>();
-        anchorTransform = transform.Find("AttachPoint");
-        lightUpColliderMaterial = lightUpCollider.GetComponent<MeshRenderer>().material;
-        if (!lightUpColliderMaterial.IsKeywordEnabled("_EMISSION"))
-            lightUpColliderMaterial.EnableKeyword("_EMISSION");
 
-        rigidbody = GetComponent<Rigidbody>();
+        m_DrawAction.AddOnStateDownListener(TriggerDown, SteamVR_Input_Sources.LeftHand);
+        m_DrawAction.AddOnStateDownListener(TriggerDown, SteamVR_Input_Sources.RightHand);
+        m_DrawAction.AddOnStateUpListener(TriggerUp, SteamVR_Input_Sources.LeftHand);
+        m_DrawAction.AddOnStateUpListener(TriggerUp, SteamVR_Input_Sources.RightHand);
+
+        m_SwitchToolAction.AddOnStateDownListener(ButtonDown, SteamVR_Input_Sources.LeftHand);
+        m_SwitchToolAction.AddOnStateDownListener(ButtonDown, SteamVR_Input_Sources.RightHand);
+
+        attachments = transform.Find("Attachments");
     }
 
     void Update()
     {
-        if (IsJointAttached() && fixedJoint.connectedBody == null)
+        if (isTriggerDown)
         {
-            //isJointAttached = false;
-            Destroy(fixedJoint);
-            m_InputController.SetTool(InputController.Tool.None);
+            Drawing();
         }
 
         if (interactable.attachedToHand != null)
         {
-            //rigidbody.isKinematic = true;
-            if (!IsJointAttached())
+            if (!shownChangeToolHint)
             {
-                // light flash collider to show where to put a tool
-                // Increase current time by deltaTime or reset to 0
-                currentCycleTime += currentCycleTime < m_TotalLightUpCycleTime ? Time.deltaTime : -currentCycleTime;
+                // TODO: add button to toggle hints
+                ControllerButtonHints.ShowButtonHint(interactable.attachedToHand, m_SwitchToolAction);
+                ControllerButtonHints.ShowTextHint(interactable.attachedToHand, m_SwitchToolAction, "Switch Tool");
+                hintHand = interactable.attachedToHand;
             }
-            else if (currentCycleTime != 0) // make sure collider is transparent if joint is attached
+            else if (!shownDrawHint)
             {
-                currentCycleTime = 0;
+                ControllerButtonHints.ShowButtonHint(interactable.attachedToHand, m_DrawAction);
+                ControllerButtonHints.ShowTextHint(interactable.attachedToHand, m_DrawAction, "Draw");
+                hintHand = interactable.attachedToHand;
             }
+        }
+        else if (hintHand != null)
+        {
+            ControllerButtonHints.HideAllButtonHints(hintHand);
+            ControllerButtonHints.HideAllTextHints(hintHand);
+            hintHand = null;
+        }
+    }
 
-            // use current cycle time to determine color of collider
-            float lerpValue = (currentCycleTime > m_TotalLightUpCycleTime / 2
-                ? m_TotalLightUpCycleTime - currentCycleTime
-                : currentCycleTime)
-                / (m_TotalLightUpCycleTime / 2);
+    public void TriggerDown(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        if (interactable.attachedToHand == null) return;
 
-            if (lightUpColliderMaterial.GetFloat("_Mode") == 2) // fade shader
-            {
-                lightUpColliderMaterial.color = Color.Lerp(Color.clear, Color.white, lerpValue);
-            }
+        if (shownChangeToolHint && !shownDrawHint)
+        {
+            shownDrawHint = true;
+            ControllerButtonHints.HideButtonHint(interactable.attachedToHand, m_DrawAction);
+            ControllerButtonHints.HideTextHint(interactable.attachedToHand, m_DrawAction);
+        }
 
-            SteamVR_Input_Sources source = interactable.attachedToHand.handType;
-            
-            if (m_DrawAction[source].stateDown) // trigger down
-            {
-                if (!isTriggerDown)
-                    StartDraw();
-                else
-                    Drawing();
-            }
-            else if (m_DrawAction[source].stateUp) // trigger up
-            {
-                StopDraw();
-            }
-       
+        StartDraw();
+    }
+
+    public void TriggerUp(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        if (interactable.attachedToHand == null) return;
+
+        StopDraw();
+    }
+    
+    public void ButtonDown(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+    {
+        if (interactable.attachedToHand == null) return;
+
+        if (!shownChangeToolHint)
+        {
+            shownChangeToolHint = true;
+            ControllerButtonHints.HideButtonHint(interactable.attachedToHand, m_SwitchToolAction);
+            ControllerButtonHints.HideTextHint(interactable.attachedToHand, m_SwitchToolAction);
+        }
+        // cycle through attachments
+        int count = attachments.childCount;
+        if (currentAttachment == count - 1)
+        {
+            ToggleMeshRenderer(attachments.GetChild(currentAttachment), false);
+            currentAttachment = -1;
+            SetTool("none");
         }
         else
         {
-            //rigidbody.isKinematic = false;
-            if (lightUpColliderMaterial.GetFloat("_Mode") == 2 && lightUpColliderMaterial.color != Color.clear) // fade shader
-            {
-                lightUpColliderMaterial.color = Color.clear;
-            }
-        }
+            if (currentAttachment != -1)
+                ToggleMeshRenderer(attachments.GetChild(currentAttachment), false);
 
+            ++currentAttachment;
+            ToggleMeshRenderer(attachments.GetChild(currentAttachment), true);
 
-        // TODO: remove
-        // for debugging purposes, toggle the fixed joint break strength in real time
-        if (IsJointAttached() && fixedJoint.connectedBody != null)
-        {
-            fixedJoint.breakForce = m_BreakForce;
+            SetTool(attachments.GetChild(currentAttachment).name);
         }
     }
 
-    bool IsJointAttached()
+    private void ToggleMeshRenderer(Transform obj, bool enabled)
     {
-        return fixedJoint != null;
+        obj.gameObject.GetComponentInChildren<MeshRenderer>().enabled = enabled;
     }
 
-    void OnTriggerEnter(Collider other)
+    private void SetTool(string toolName)
     {
-        if (fixedJoint != null && fixedJoint.connectedBody != null) return;
-
-        
-        string name = other.gameObject.name.ToLower();
-        if (name.Contains("line") || name.Contains("area") || name.Contains("cube") || name.Contains("mesh"))
-        {
-            fixedJoint = gameObject.AddComponent<FixedJoint>();
-            Debug.Log($"Collider entered: {other.name}");
-
-            fixedJoint.connectedBody = other.attachedRigidbody;
-            fixedJoint.anchor = anchorTransform.localPosition;
-            
-            // TODO: figure out how to make the attachpoint on the obj line up with the anchor point
-            // find offset of obj and attachpoint, anchor = obj.transform.pos + offset;
-            Transform objAttachPoint = other.transform.Find("AttachPoint");
-            if (objAttachPoint != null)
-            {
-                Vector3 offset = objAttachPoint.localPosition; // TODO: this is local offset not global
-                other.transform.position = anchorTransform.position - offset;
-            }
-            other.transform.rotation = anchorTransform.rotation;
-
-            //isJointAttached = true;
-
-            if (name.Contains("line"))
-                m_InputController.SetTool(InputController.Tool.Line);
-            else if (name.Contains("area"))
-                m_InputController.SetTool(InputController.Tool.Area);
-            else if (name.Contains("cube"))
-                m_InputController.SetTool(InputController.Tool.Volume);
-            else if (name.Contains("mesh"))
-                m_InputController.SetTool(InputController.Tool.Mesh);
-        }
+        toolName = toolName.ToLower();
+        if (toolName.Contains("none"))
+            m_InputController.SetTool(InputController.Tool.None);
+        else if (toolName.Contains("line"))
+            m_InputController.SetTool(InputController.Tool.Line);
+        else if (toolName.Contains("area"))
+            m_InputController.SetTool(InputController.Tool.Area);
+        else if (toolName.Contains("cube"))
+            m_InputController.SetTool(InputController.Tool.Volume);
+        else if (toolName.Contains("mesh"))
+            m_InputController.SetTool(InputController.Tool.Mesh);
     }
 
     void StartDraw()
     {
-        isTriggerDown = true;
+        Debug.Log("State: start");
         m_InputController.Clicked();
+        isTriggerDown = true;
     }
 
     void Drawing()
     {
+        Debug.Log("State: drawing");
         m_InputController.Dragged();
     }
 
     void StopDraw()
     {
+        Debug.Log("State: end");
         isTriggerDown = false;
         m_InputController.MouseUp();
     }

@@ -10,10 +10,13 @@ public class MeshCreatorController : MonoBehaviour
     private Mesh m_Mesh;
     private MeshCollider m_MeshCollider;
     public GameObject m_Line;
+    [System.NonSerialized]
     public Vector3 m_PositionOffset;
     private Vector3[] m_AreaVertices;
     private List<GameObject> m_MeshLines = new List<GameObject>();
+    [HideInInspector]
     public List<Vector3> m_Vertices = new List<Vector3>();
+    [HideInInspector]
     public List<int> m_Triangles = new List<int>();
     [System.NonSerialized]
     public bool m_SnapToGrid = true;

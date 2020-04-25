@@ -6,20 +6,21 @@ using UnityEngine;
 // Controls whether or not a shape lights up on collision
 public class LightUpOnCollision : MonoBehaviour
 {
-
-    public bool collision;
+    [System.NonSerialized]
+    public bool collision = false;
+    [System.NonSerialized]
+    public MeshRenderer m_MeshRenderer;
+    [System.NonSerialized]
+    public Material m_Mat;
     private InputController mInputController;
     private bool Enabled = true;
+    [System.NonSerialized]
     public bool wasEnabled = true;
-    public MeshRenderer m_MeshRenderer;
-    public Material m_Mat;
     void Start()
     {
         mInputController = GameObject.Find("ToolController").GetComponent<InputController>();
         m_MeshRenderer = GetComponent<MeshRenderer>();
         m_Mat = m_MeshRenderer.material;
-
-        collision = false;
     }
 
     void Update()
