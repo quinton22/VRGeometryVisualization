@@ -25,22 +25,25 @@ public class PointerController : MonoBehaviour
     [Header("Scale Pointer")]
     [SerializeField]
     [Tooltip("Time, in seconds, it takes pointer to scale up when drawing")]
-    private float m_ScaleTime = 1;
+    private float m_ScaleTime = .2f;
     [SerializeField]
     [Tooltip("Maximum times the initial scale that the pointer increases")]
-    private float m_MaxScale = 10;
-    private float initialScale;
+    private float m_MaxScale = 5;
+    private Vector3 initialScale;
     private int scaleDirection = 0; // -1 for decreasing, 0 for no change, 1 for incr
     private float currentScaleTime = 0;
     [SerializeField]
     [Tooltip("Scale of pointer increases the farther you are away")]
     private bool m_ScaleIncreaseWithDistance = false;
+    [SerializeField]
+    [Tooltip("Maximum multiplier on scale")]
+    private float m_MaxDistanceScale = 2; 
     
     // Start is called before the first frame update
     void Start()
     {
         m_InitialLocalPosition = transform.localPosition;
-        initialScale = transform.localScale.x;
+        initialScale = transform.localScale;
     }
 
     // Update is called once per frame
@@ -112,10 +115,11 @@ public class PointerController : MonoBehaviour
                 scaleDirection = 0;
             }
 
-            float distanceScale = m_ScaleIncreaseWithDistance ? (!isCentered ? Mathf.Lerp(1, 3, transform.localPosition.magnitude / 3) : 1) : 1;
-            transform.localScale = distanceScale * (new Vector3(initialScale, initialScale, initialScale))
-                    * Mathf.Lerp(initialScale, initialScale * m_MaxScale, currentScaleTime / m_ScaleTime);
+            
+            transform.localScale = Vector3.Lerp(initialScale, initialScale * m_MaxScale, currentScaleTime / m_ScaleTime);
         }
+        else if (m_ScaleIncreaseWithDistance && !isCentered)
+            transform.localScale = Vector3.Lerp(initialScale * m_MaxScale, initialScale * m_MaxScale * m_MaxDistanceScale, transform.localPosition.magnitude / 100);
     }
 
     public void SetPointerPlane(Vector3 a, Vector3 b, Vector3 c)

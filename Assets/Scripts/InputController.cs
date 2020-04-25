@@ -471,10 +471,7 @@ public class InputController : MonoBehaviour
         }
         else if (m_MeshForVolume != null)
         {
-            
-            Debug.DrawRay(initialPosition, m_MeshCreatorController.GetNorm(), Color.green, 100);
             Vector3 updatedValue = Vector3.Project((currentPosition - initialPosition), m_MeshCreatorController.GetNorm());
-            Debug.DrawRay(initialPosition, updatedValue, Color.red, 100);
             if (snapToGrid)
             {
                 float scale = m_ScaleDivision; // TODO: change
@@ -491,7 +488,6 @@ public class InputController : MonoBehaviour
 
                 updatedValue /= scale;
             }
-            Debug.DrawRay(initialPosition + Vector3.ProjectOnPlane(new Vector3(1, 1, 1), updatedValue), updatedValue, Color.yellow, 100);
             m_MeshCreatorController.UpdateMesh(updatedValue);
             
         }

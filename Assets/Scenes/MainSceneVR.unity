@@ -5917,6 +5917,7 @@ MonoBehaviour:
   m_ScaleTime: 0.2
   m_MaxScale: 5
   m_ScaleIncreaseWithDistance: 1
+  m_MaxDistanceScale: 5
 --- !u!64 &1714393598
 MeshCollider:
   m_ObjectHideFlags: 0
