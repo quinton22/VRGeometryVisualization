@@ -34,7 +34,10 @@ public class GlobalGridScale : Singleton<GlobalGridScale>
 
     void OnValidate()
     {
-        UpdateValues();
+        if (GridScale < 0)
+            GridScale = 0;
+        else
+            UpdateValues();
     }
 
     void OnDestroy()

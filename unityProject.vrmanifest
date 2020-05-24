@@ -5,7 +5,7 @@
       "app_key": "application.generated.unity.geometryvisualization.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "D:\\Unity\\Games\\VRGeometryVisualization\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "D:\\Unity Projects\\GeometryVisualization\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
           "name": "GeometryVisualization [Testing]"
