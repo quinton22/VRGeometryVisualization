@@ -17,15 +17,17 @@ public class GridShaderInput : MonoBehaviour
     private float gridScale = 1;
     [SerializeField]
     private float gridLineThickness = 0.02f;
-    private MeshRenderer meshRenderer;
+    private Renderer _renderer;
     private Material material;
+    private MaterialPropertyBlock propBlock;
 
     //public Vector3 _scale;
 
     void Awake()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
-        material = meshRenderer.sharedMaterial;
+        propBlock = new MaterialPropertyBlock();
+        _renderer = GetComponent<Renderer>();
+        material = _renderer.material;
         UpdateGridScale();
         GlobalGridScale.AddScaleListener(UpdateGridScale);
         InitializeMaterial();
@@ -40,8 +42,8 @@ public class GridShaderInput : MonoBehaviour
     {
         gridScale = Mathf.Max(0, gridScale);
         gridLineThickness = Mathf.Max(0, gridLineThickness);
-        meshRenderer = GetComponent<MeshRenderer>();
-        material = meshRenderer.sharedMaterial;
+        _renderer = GetComponent<Renderer>();
+        material = _renderer.sharedMaterial;
 
         // if (m_ShapeType == ShapeType.Area)
         //     transform.parent.localScale = _scale;
@@ -67,7 +69,12 @@ public class GridShaderInput : MonoBehaviour
 
     void SetMaterialScale()
     {
+        if (propBlock == null)
+            propBlock = new MaterialPropertyBlock();
+        
         Vector3 scale = m_ShapeType == ShapeType.Area ? transform.parent.localScale : transform.localScale;
-        material.SetVector("_Scale", new Vector4(scale.x, scale.y, scale.z, 1));
+        _renderer.GetPropertyBlock(propBlock);
+        propBlock.SetVector("_Scale", new Vector4(scale.x, scale.y, scale.z, 1));
+        _renderer.SetPropertyBlock(propBlock);
     }
 }

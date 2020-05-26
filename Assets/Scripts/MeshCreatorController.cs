@@ -33,8 +33,8 @@ public class MeshCreatorController : MonoBehaviour
         m_MeshCollider = GetComponent<MeshCollider>();
         m_MeshCollider.sharedMesh = m_Mesh;
 
-
-        m_Line = transform.Find("Line").gameObject;
+        if (m_Line == null)
+            m_Line = transform.Find("Line").gameObject;
     }
 
     public Vector3 GetVertexWithWorldCoord(int index)

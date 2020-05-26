@@ -17,7 +17,7 @@
         _GridLineThickness ("Grid Line Thickness", float) = 0.01
         [KeywordEnum(Line, Area, Volume, Mesh)]
         _ShapeType ("Shape Type", int) = 0
-        [HideInInspector]
+        [PerRendererData]
         _Scale ("Scale", Vector) = (1,1,1,1)
     }
     SubShader
@@ -67,7 +67,7 @@
             // TODO: there is likely a better way of doing this
             float adjustedGridLineThickness = _GridLineThickness / 2;
             int total = floor(scale * scaleAdjustment * _GridScale) + 1;
-            if (isVolume && scale * scaleAdjustment * _GridScale == total - 1) total -= 1; 
+            if (isVolume) total -= 1; 
             float start;
             for (int i = isVolume ? 1 : 0; i < total; i++)
             {
@@ -106,7 +106,11 @@
 
         void meshGrid (Input IN, inout SurfaceOutputStandard o)
         {
+            o.Albedo = _MainColor.rgb;
 
+            computeGrid(IN.objectPos.y, _Scale.y, 1, o, true);
+            computeGrid(IN.objectPos.x, _Scale.x, 1, o, true);
+            computeGrid(IN.objectPos.z, _Scale.z, 1, o, true);
         }
 
         void vert (inout appdata_full v, out Input o) {

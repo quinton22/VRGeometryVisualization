@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LightUpGridLine
+  m_Name: LightUpGridMesh
   m_Shader: {fileID: 4800000, guid: 785baa3c04d65af41a6ddbf26ee04825, type: 3}
-  m_ShaderKeywords: _SHAPETYPE_LINE
+  m_ShaderKeywords: _SHAPETYPE_VOLUME
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -73,7 +73,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _ShapeType: 0
+    - _ShapeType: 3
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
