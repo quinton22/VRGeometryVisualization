@@ -44,6 +44,7 @@ public class InputController : MonoBehaviour
     [SerializeField] private GameObject m_Pointer;
     private PointerController m_PointerController;
     private PenInputController penInput;
+    private Vector3 initialPenPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -62,6 +63,7 @@ public class InputController : MonoBehaviour
         m_PointerController = m_Pointer.GetComponent<PointerController>();
 
         penInput = FindObjectOfType<PenInputController>();
+        initialPenPosition = penInput.transform.position;
     }
 
     // Update is called once per frame
@@ -114,6 +116,12 @@ public class InputController : MonoBehaviour
             //currentPosition = m_Pointer.transform.position;
             DrawMesh();
         }
+    }
+
+    public void ResetPenPosition()
+    {
+        penInput.transform.position = initialPenPosition;
+        penInput.transform.rotation = Quaternion.identity;
     }
 
     private void UpdateGridScale()
