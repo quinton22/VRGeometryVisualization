@@ -125,7 +125,6 @@ public class InputController : MonoBehaviour
     {
         while (m_CurrentTool != targetTool)
         {
-            Debug.Log(penInput == null);
             penInput.NextAttachment();
         }
     }

@@ -16,11 +16,61 @@ public class LightUpOnCollision : MonoBehaviour
     private bool Enabled = true;
     [System.NonSerialized]
     public bool wasEnabled = true;
-    void Start()
+    [SerializeField]
+    private bool transparent = false;
+    private ShaderVariant shaderVariant;
+
+    public abstract class ShaderVariant 
+    {
+        public const string KEYWORD = "_EMISSION";
+        public Material material;
+        public abstract bool Emission
+        {
+            get;
+            set;
+        }
+
+        public static ShaderVariant Factory(bool transparent, Material _material)
+        {
+            ShaderVariant sv = transparent ? (ShaderVariant) new TransparentShaderVariant() : (ShaderVariant) new OpaqueShaderVariant();
+            sv.material = _material;
+            return sv;
+        }
+    }
+
+    public class TransparentShaderVariant : ShaderVariant
+    {
+        public override bool Emission
+        {
+            get {
+                return material.IsKeywordEnabled(KEYWORD);
+            }
+            set {
+                if (value) material.EnableKeyword(KEYWORD);
+                else material.DisableKeyword(KEYWORD);
+            }
+        }
+    }
+
+    public class OpaqueShaderVariant : ShaderVariant
+    {
+        public override bool Emission
+        {
+            get {
+                return material.GetFloat(KEYWORD) == 1;
+            }
+            set {
+                material.SetFloat(KEYWORD, value ? 1 : 0);
+            }
+        }
+    }
+
+    public void Start()
     {
         mInputController = GameObject.Find("ToolController").GetComponent<InputController>();
         m_MeshRenderer = GetComponent<MeshRenderer>();
         m_Mat = m_MeshRenderer.material;
+        shaderVariant = ShaderVariant.Factory(transparent, m_Mat);
     }
 
     void Update()
@@ -29,9 +79,9 @@ public class LightUpOnCollision : MonoBehaviour
         {
             wasEnabled = false;
 
-            if (m_Mat.IsKeywordEnabled("_EMISSION"))
+            if (shaderVariant.Emission)
             {
-                m_Mat.DisableKeyword("_EMISSION");
+                shaderVariant.Emission = false;
                 collision = false;
             }
 
@@ -53,16 +103,15 @@ public class LightUpOnCollision : MonoBehaviour
 
         if (other.gameObject.name == "Pointer")
         {
-            bool enabled = m_Mat.IsKeywordEnabled("_EMISSION");
-
-            if (m_Mat.GetFloat("_Mode") == 2) // fade shader
+            if (transparent && m_Mat.GetFloat("_Mode") == 2) // fade shader
             {
                 m_Mat.color = Color.white;
             }
 
-            if (!enabled && checkCurrentTool())
+            if (!shaderVariant.Emission && checkCurrentTool())
             {
-                m_Mat.EnableKeyword("_EMISSION");
+                Debug.Log("here");
+                shaderVariant.Emission = true;
                 collision = true;
              
                 other.gameObject.GetComponent<PointerController>().collidingObject = gameObject;
@@ -75,22 +124,19 @@ public class LightUpOnCollision : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.name == "Pointer")
-        {
-            bool enabled = m_Mat.IsKeywordEnabled("_EMISSION");
-            
-            if (m_Mat.GetFloat("_Mode") == 2) // fade shader
+        {            
+            if (transparent && m_Mat.GetFloat("_Mode") == 2) // fade shader
             {
                 m_Mat.color = Color.clear;
             }
 
-            if (enabled)
+            if (shaderVariant.Emission)
             {
-                m_Mat.DisableKeyword("_EMISSION");
+                shaderVariant.Emission = false;
                 collision = false;
 
                 other.gameObject.GetComponent<PointerController>().collidingObject = null;
             }
-
         }
     }
 
@@ -103,6 +149,4 @@ public class LightUpOnCollision : MonoBehaviour
             (ct == InputController.Tool.Volume && gameObject.name.Contains("Mesh")) ||
             (ct == InputController.Tool.Mesh && gameObject.name.Contains("Sphere"));
     }
-
-
 }

@@ -741,6 +741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!1 &101305009
 GameObject:
   m_ObjectHideFlags: 0
@@ -946,6 +947,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!136 &175070394
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1221,6 +1223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!64 &252113107
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2300,11 +2303,12 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EMISSION: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _GridLineThickness: 0.02
-    - _GridScale: 2
+    - _GridScale: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -2317,7 +2321,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0, g: 1, b: 0, a: 1}
     - _GridColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainColor: {r: 1, g: 1, b: 1, a: 1}
     - _Scale: {r: 1, g: 1, b: 1, a: 1}
@@ -3079,6 +3083,7 @@ GameObject:
   - component: {fileID: 832599168}
   - component: {fileID: 832599167}
   - component: {fileID: 832599166}
+  - component: {fileID: 832599170}
   m_Layer: 0
   m_Name: CanvasFlipped
   m_TagString: Untagged
@@ -3114,7 +3119,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 832599164}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db653ac0b7f109e4f9cbd9ee2f6cd5d9, type: 3}
   m_Name: 
@@ -3180,6 +3185,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &832599170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 832599164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c949bcd1fda1e334bbc50035a171f7ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Pointer: {fileID: 1714393592}
 --- !u!1 &857883882
 GameObject:
   m_ObjectHideFlags: 0
@@ -3298,6 +3316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!64 &857883887
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3371,7 +3390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c3d264807c7ec64eacd2d3362f66aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Line: {fileID: 0}
+  m_Line: {fileID: 175070388}
   m_Vertices: []
   m_Triangles: 
 --- !u!1 &925725092
@@ -3594,6 +3613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!135 &971485317
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4518,6 +4538,7 @@ GameObject:
   - component: {fileID: 1194071777}
   - component: {fileID: 1194071776}
   - component: {fileID: 1194071775}
+  - component: {fileID: 1194071779}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -4553,7 +4574,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1194071773}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db653ac0b7f109e4f9cbd9ee2f6cd5d9, type: 3}
   m_Name: 
@@ -4619,6 +4640,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1194071779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194071773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c949bcd1fda1e334bbc50035a171f7ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Pointer: {fileID: 1714393592}
 --- !u!1 &1194424718
 GameObject:
   m_ObjectHideFlags: 0
@@ -5844,6 +5878,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EMISSION: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -5861,7 +5896,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0, g: 1, b: 0, a: 1}
     - _GridColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainColor: {r: 1, g: 1, b: 1, a: 1}
     - _Scale: {r: 0.01, g: 1, b: 0.01, a: 1}
@@ -6289,6 +6324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!64 &1524057795
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -6363,7 +6399,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShapeType: 1
-  gridScale: 2
+  gridScale: 1
   gridLineThickness: 0.02
 --- !u!1 &1527289942
 GameObject:
@@ -6544,6 +6580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!114 &1552456613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7191,6 +7228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!136 &1621104070
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -8111,6 +8149,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EMISSION: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -8128,7 +8167,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 0, g: 1, b: 0, a: 1}
     - _GridColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainColor: {r: 1, g: 1, b: 1, a: 1}
     - _Scale: {r: 1, g: 1, b: 1, a: 1}
@@ -8553,6 +8592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!114 &1924947785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8789,7 +8829,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1997139032
 Transform:
   m_ObjectHideFlags: 0
@@ -8885,6 +8925,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!64 &1997139036
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -9230,6 +9271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!114 &2019497391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9461,6 +9503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 1
 --- !u!135 &2044292993
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -9629,6 +9672,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ba1f33d70707ce40a869583b3cc4eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transparent: 0
 --- !u!1 &2131855585
 GameObject:
   m_ObjectHideFlags: 0

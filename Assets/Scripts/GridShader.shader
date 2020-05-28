@@ -10,9 +10,10 @@
         _GridTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
+        [Toggle] _EMISSION ("Emission", float) = 0
         _EmissionColor ("Color", Color) = (0,0,0,0)
         [NoScaleOffset]
-        _EmissionMap ("Emission", 2D) = "white" {}
+        _EmissionMap ("Emission Tex", 2D) = "white" {}
         _GridScale ("Grid Scale", float) = 1
         _GridLineThickness ("Grid Line Thickness", float) = 0.01
         [KeywordEnum(Line, Area, Volume, Mesh)]
@@ -40,14 +41,13 @@
             float2 uv_MainTex;
             float3 worldPos;
             float3 objectPos;
-            //float3 localPos;
         };
 
         half _Glossiness;
         half _Metallic;
         fixed4 _MainColor;
         fixed4 _GridColor;
-        bool _EmissionEnabled;
+        float _EMISSION;
         fixed4 _EmissionColor;
         sampler2D _EmissionMap;
         float _GridScale;
@@ -124,7 +124,7 @@
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _MainColor;
             //o.Albedo = c.rgb;
-            if (_EmissionEnabled)
+            if (_EMISSION == 1)
             {
                 o.Emission = (tex2D (_EmissionMap, IN.uv_MainTex) * _EmissionColor).rgb;
             }
