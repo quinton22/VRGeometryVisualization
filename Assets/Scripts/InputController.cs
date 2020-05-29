@@ -45,6 +45,8 @@ public class InputController : MonoBehaviour
     private PointerController m_PointerController;
     private PenInputController penInput;
     private Vector3 initialPenPosition;
+    private DeleteTool deleteTool;
+    private Vector3 initialDeleteToolPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -64,6 +66,9 @@ public class InputController : MonoBehaviour
 
         penInput = FindObjectOfType<PenInputController>();
         initialPenPosition = penInput.transform.position;
+
+        deleteTool = FindObjectOfType<DeleteTool>();
+        initialDeleteToolPosition = deleteTool.transform.position;
     }
 
     // Update is called once per frame
@@ -94,6 +99,10 @@ public class InputController : MonoBehaviour
             // none
             CyclePenTools(Tool.None);
         }
+        else if (Input.GetKeyDown("x"))
+        {
+            deleteTool.Delete();
+        }
 
         if (Input.GetKeyDown("space"))
         {
@@ -122,6 +131,16 @@ public class InputController : MonoBehaviour
     {
         penInput.transform.position = initialPenPosition;
         penInput.transform.rotation = Quaternion.identity;
+        deleteTool.transform.position = initialDeleteToolPosition;
+        deleteTool.transform.rotation = Quaternion.identity;
+    }
+
+    public void DeleteEverything()
+    {
+        for (int i = 0; i < m_Parent.transform.childCount; ++i)
+        {
+            Destroy(m_Parent.transform.GetChild(i).gameObject);
+        }
     }
 
     private void UpdateGridScale()

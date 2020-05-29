@@ -16,6 +16,8 @@ public class LightUpOnCollision : MonoBehaviour
     private bool Enabled = true;
     [System.NonSerialized]
     public bool wasEnabled = true;
+    private PointerController pointerController;
+    private DeleteTool deleteTool;
     [SerializeField]
     private bool transparent = false;
     private ShaderVariant shaderVariant;
@@ -67,7 +69,10 @@ public class LightUpOnCollision : MonoBehaviour
 
     public void Start()
     {
-        mInputController = GameObject.Find("ToolController").GetComponent<InputController>();
+        mInputController = FindObjectOfType<InputController>();
+        pointerController = FindObjectOfType<PointerController>();
+        deleteTool = FindObjectOfType<DeleteTool>();
+
         m_MeshRenderer = GetComponent<MeshRenderer>();
         m_Mat = m_MeshRenderer.material;
         shaderVariant = ShaderVariant.Factory(transparent, m_Mat);
@@ -110,14 +115,22 @@ public class LightUpOnCollision : MonoBehaviour
 
             if (!shaderVariant.Emission && checkCurrentTool())
             {
-                Debug.Log("here");
                 shaderVariant.Emission = true;
                 collision = true;
              
-                other.gameObject.GetComponent<PointerController>().collidingObject = gameObject;
+                pointerController.collidingObject = gameObject;
                 
             }
 
+        }
+        else if (other.gameObject.name == "DeleteToolIntersector")
+        {
+            if (!shaderVariant.Emission)
+            {
+                shaderVariant.Emission = true;
+                collision = true;
+                deleteTool.intersectingObject = gameObject;
+            }
         }
     }
 
@@ -135,7 +148,16 @@ public class LightUpOnCollision : MonoBehaviour
                 shaderVariant.Emission = false;
                 collision = false;
 
-                other.gameObject.GetComponent<PointerController>().collidingObject = null;
+                pointerController.collidingObject = null;
+            }
+        }
+        else if (other.gameObject.name == "DeleteToolIntersector")
+        {
+            if (shaderVariant.Emission)
+            {
+                shaderVariant.Emission = false;
+                collision = false;
+                deleteTool.intersectingObject = null;
             }
         }
     }
