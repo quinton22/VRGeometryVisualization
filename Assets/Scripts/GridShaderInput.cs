@@ -21,6 +21,8 @@ public class GridShaderInput : MonoBehaviour
     private Material material;
     private MaterialPropertyBlock propBlock;
 
+    private bool _gridOn = true;
+
     //public Vector3 _scale;
 
     void Awake()
@@ -31,11 +33,18 @@ public class GridShaderInput : MonoBehaviour
         UpdateGridScale();
         GlobalGridScale.AddScaleListener(UpdateGridScale);
         InitializeMaterial();
+
+        _gridOn = GlobalGridScale.Instance.GridOn;
     }
     
     void Update()
     {  
         SetMaterialScale();
+
+        if (GlobalGridScale.Instance.GridOn != _gridOn) {
+            _gridOn = GlobalGridScale.Instance.GridOn;
+            UpdateGridOn();
+        }
     }
 
     void OnValidate()
@@ -65,6 +74,13 @@ public class GridShaderInput : MonoBehaviour
     {
         gridScale = GlobalGridScale.Instance.GridScale;
         material.SetFloat("_GridScale", gridScale);
+        gridLineThickness = 4 * 0.02f / gridScale;
+        material.SetFloat("GridLineThickness", gridLineThickness);
+    }
+
+    void UpdateGridOn()
+    {
+        material.SetFloat("_ShadeGrid", _gridOn ? 1 : 0);
     }
 
     void SetMaterialScale()

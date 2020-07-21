@@ -20,6 +20,7 @@
         _ShapeType ("Shape Type", int) = 0
         [PerRendererData]
         _Scale ("Scale", Vector) = (1,1,1,1)
+        _ShadeGrid ("Shade Grid", int) = 1
     }
     SubShader
     {
@@ -54,6 +55,7 @@
         float _GridLineThickness;
         int _ShapeType;
         float3 _Scale;
+        int _ShadeGrid;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -67,14 +69,25 @@
             // TODO: there is likely a better way of doing this
             float adjustedGridLineThickness = _GridLineThickness / 2;
             int total = floor(scale * scaleAdjustment * _GridScale) + 1;
-            if (isVolume) total -= 1; 
             float start;
             for (int i = isVolume ? 1 : 0; i < total; i++)
             {
+                
                 start = (objPos + 0.5 * scaleAdjustment) * scale - 1.0 / _GridScale * i;
                 if (start <= adjustedGridLineThickness && start >= -adjustedGridLineThickness)
                 {
-                    o.Albedo = _GridColor.rgb;
+                    float end = start - (scale - 1.0 / _GridScale * i);
+                    if (isVolume && i == total - 1 && end >= -adjustedGridLineThickness && end <= adjustedGridLineThickness)
+                    {
+                        // skip
+                    }
+                    else {
+                        o.Albedo = _GridColor.rgb;
+                    }
+                    // if (!(isVolume && i == total - 1)) {
+                    // } else {
+                    //     o.Albedo = float4(1,0,0,0);
+                    // }
                     return;
                 }
             }
@@ -130,14 +143,22 @@
             }
             float4 objectOrigin = mul(unity_ObjectToWorld, float4(0,0,0,1));
             
-            if (_ShapeType == 0)
-                lineGrid(IN, o);
-            else if (_ShapeType == 1)
-                areaGrid(IN, o);
-            else if (_ShapeType == 2)
-                volumeGrid(IN, o);
-            else if (_ShapeType == 3)
-                meshGrid(IN, o);
+            if (_ShadeGrid == 1)
+            {
+                if (_ShapeType == 0)
+                    lineGrid(IN, o);
+                else if (_ShapeType == 1)
+                    areaGrid(IN, o);
+                else if (_ShapeType == 2)
+                    volumeGrid(IN, o);
+                else if (_ShapeType == 3)
+                    meshGrid(IN, o);
+            }
+            else
+            {
+                o.Albedo = _MainColor.rgb;
+            }
+            
 
             
             // // Metallic and smoothness come from slider variables

@@ -10,8 +10,10 @@ public class GlobalGridScale : Singleton<GlobalGridScale>
     protected GlobalGridScale() { }
 
     private static UnityEvent m_UpdateValues = new UnityEvent();
+    
+    public bool GridOn = true;
 
-    [Range(1, 10), SerializeField] 
+    [Range(1, 20), SerializeField] 
     private int m_GridScale = 4;
     public int GridScale {
         get { return m_GridScale; }
@@ -43,5 +45,10 @@ public class GlobalGridScale : Singleton<GlobalGridScale>
     void OnDestroy()
     {
         m_UpdateValues.RemoveAllListeners();
+    }
+
+    public void ToggleGridOn()
+    {
+        GridOn = !GridOn;
     }
 }
