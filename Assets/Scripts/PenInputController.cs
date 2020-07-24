@@ -9,6 +9,8 @@ public class PenInputController : MonoBehaviour
     public InputController m_InputController;
     public SteamVR_Action_Boolean m_DrawAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("Draw");
     public SteamVR_Action_Boolean m_SwitchToolAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("SwitchTool");
+    [Tooltip("This currently does nothing")]
+    public bool isGripToggle = false; // TODO
     private Interactable interactable;
     private bool isTriggerDown = false;
     private Transform attachments;
@@ -147,20 +149,20 @@ public class PenInputController : MonoBehaviour
 
     void StartDraw()
     {
-        Debug.Log("State: start");
+        //Debug.Log("State: start");
         m_InputController.Clicked();
         isTriggerDown = true;
     }
 
     void Drawing()
     {
-        Debug.Log("State: drawing");
+        //Debug.Log("State: drawing");
         m_InputController.Dragged();
     }
 
     void StopDraw()
     {
-        Debug.Log("State: end");
+        //Debug.Log("State: end");
         isTriggerDown = false;
         m_InputController.MouseUp();
     }

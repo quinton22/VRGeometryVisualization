@@ -17,6 +17,22 @@ public class InputController : MonoBehaviour
         Mesh
     }
 
+    // New stuff
+    // ================================================
+    private DrawableLine m_DrawableLine;
+    private DrawableArea m_DrawableArea;
+    private DrawableVolume m_DrawableVolume;
+
+
+
+
+
+
+
+
+
+    // ================================================
+
     [System.NonSerialized]
     public Tool m_CurrentTool;
     // what to divide 1 unit up into
@@ -47,12 +63,24 @@ public class InputController : MonoBehaviour
     private Vector3 initialPenPosition;
     private DeleteTool deleteTool;
     private Vector3 initialDeleteToolPosition;
+    private IntroductionScript mIntroductionScript;
 
     // Start is called before the first frame update
     void Start()
     {
+
+        m_DrawableLine = GetComponent<DrawableLine>();
+        m_DrawableArea = GetComponent<DrawableArea>();
+        m_DrawableVolume = GetComponent<DrawableVolume>();
+
+        m_DrawableVolume.AddListener(() => { mIntroductionScript.CheckVolume(m_DrawableVolume.m_LastCreatedShape.transform, DrawableVolume.m_SubdivisionScale);},
+            DrawableVolume.ListenerType.PostFinish);
+
+
         m_CurrentTool = Tool.None;
 //        m_ToolText = GameObject.Find("ActiveToolText").GetComponent<Text>();
+
+        mIntroductionScript = FindObjectOfType<IntroductionScript>();
 
         UpdateGridScale();
         GlobalGridScale.AddScaleListener(UpdateGridScale);
@@ -200,8 +228,14 @@ public class InputController : MonoBehaviour
 
                 // draw point ?
                 drawing = Tool.Line;
-                initialPosition = m_Pointer.transform.position;
-                m_LineCopy = UnityEngine.Object.Instantiate(m_Line, initialPosition, Quaternion.identity, m_Parent.transform);
+
+
+                // TODO: change back
+                m_DrawableLine.StartDrawing(m_Pointer.transform.position);
+
+                // TODO: change back
+                // initialPosition = m_Pointer.transform.position;
+                // m_LineCopy = UnityEngine.Object.Instantiate(m_Line, initialPosition, Quaternion.identity, m_Parent.transform);
                 break;
             case Tool.Area:
                 if (m_PointerController.collidingObject != null && m_PointerController.collidingObject.name.Contains("Line"))
@@ -210,9 +244,15 @@ public class InputController : MonoBehaviour
 
                     m_LineForArea = m_PointerController.collidingObject;
                     drawing = Tool.Area;
-                    initialPosition = m_LineForArea.transform.position;
-                    m_AreaCopy = UnityEngine.Object.Instantiate(m_Area, initialPosition, Quaternion.identity, m_Parent.transform);
-                    Dragged();
+
+                    // TODO: change back
+                    m_DrawableArea.m_UpVec = m_LineForArea.transform.up;
+                    m_DrawableArea.m_YScale = m_LineForArea.transform.localScale.y;
+                    m_DrawableArea.StartDrawing(m_LineForArea.transform.position);
+                    // TODO: change back
+                    // initialPosition = m_LineForArea.transform.position;
+                    // m_AreaCopy = UnityEngine.Object.Instantiate(m_Area, initialPosition, Quaternion.identity, m_Parent.transform);
+                    Dragged(); // TODO: do we need? if so add to post start
                 }
                 break;
             case Tool.Volume:
@@ -224,9 +264,15 @@ public class InputController : MonoBehaviour
                     {
                         m_AreaForVolume = m_PointerController.collidingObject.transform.parent.gameObject;
                         drawing = Tool.Volume;
-                        initialPosition = m_AreaForVolume.transform.position;
-                        m_VolumeCopy = UnityEngine.Object.Instantiate(m_Volume, initialPosition, Quaternion.identity, m_Parent.transform);
-                        m_VolumeCopy.GetComponent<VolumeForwardController>().ZDirection = -m_AreaForVolume.transform.forward;
+                        // TODO: change back
+                        m_DrawableVolume.m_AreaLocalRotation = m_AreaForVolume.transform.localRotation;
+                        m_DrawableVolume.m_AreaLocalScale = m_AreaForVolume.transform.localScale;
+                        m_DrawableVolume.m_AreaForwardDir = m_AreaForVolume.transform.forward;
+                        m_DrawableVolume.StartDrawing(m_AreaForVolume.transform.position);
+                        // TODO: change back
+                        // initialPosition = m_AreaForVolume.transform.position;
+                        // m_VolumeCopy = UnityEngine.Object.Instantiate(m_Volume, initialPosition, Quaternion.identity, m_Parent.transform);
+                        // m_VolumeCopy.GetComponent<VolumeForwardController>().ZDirection = -m_AreaForVolume.transform.forward;
                     }
                     else if (m_PointerController.collidingObject.transform.name.Contains("Mesh"))
                     {
@@ -256,20 +302,30 @@ public class InputController : MonoBehaviour
 
     public void Dragged()
     {
+        // TODO: move currentPosition outside of switch case
         // drag out
         switch (m_CurrentTool)
         {
             case Tool.Line:
                 currentPosition = m_Pointer.transform.position;
-                DrawLine();
+                // TODO: change back
+                m_DrawableLine.Drawing(currentPosition);
+                // TODO: change back
+                // DrawLine();
                 break;
             case Tool.Area:
                 currentPosition = m_Pointer.transform.position;
-                DrawArea();
+                // TODO: change back
+                m_DrawableArea.Drawing(currentPosition);
+                // TODO: change back
+                // DrawArea();
                 break;
             case Tool.Volume:
                 currentPosition = m_Pointer.transform.position;
-                DrawVolume();
+                // TODO: change back
+                m_DrawableVolume.Drawing(currentPosition);
+                // TODO: change back
+                // DrawVolume();
                 break;
             case Tool.Mesh:
                 // TODO
@@ -299,84 +355,97 @@ public class InputController : MonoBehaviour
         switch (m_CurrentTool)
         {
             case Tool.Line:
-                float sd = m_ScaleDivision * 2;
-                // round to nearest (sub)unit
-                Vector3 scaleL = m_LineCopy.transform.localScale;
-                scaleL.y *= sd;
-                if (scaleL.y < 1) {
-                    scaleL.y = 1;
-                }
-                else
-                {
-                    scaleL.y = Mathf.Round(scaleL.y);
-                }
-                scaleL.y /= sd;
+                // TODO: change back
+                m_DrawableLine.StopDrawing();
+                // TODO: change back
+                // float sd = m_ScaleDivision * 2;
+                // // round to nearest (sub)unit
+                // Vector3 scaleL = m_LineCopy.transform.localScale;
+                // scaleL.y *= sd;
+                // if (scaleL.y < 1) {
+                //     scaleL.y = 1;
+                // }
+                // else
+                // {
+                //     scaleL.y = Mathf.Round(scaleL.y);
+                // }
+                // scaleL.y /= sd;
 
-                float deltaY = scaleL.y - m_LineCopy.transform.localScale.y;
+                // float deltaY = scaleL.y - m_LineCopy.transform.localScale.y;
 
-                m_LineCopy.transform.localScale = scaleL;
+                // m_LineCopy.transform.localScale = scaleL;
 
-                // move position to adjust for change of size
-                Vector3 posL = m_LineCopy.transform.position;
-                posL += m_LineCopy.transform.up * deltaY;
-                m_LineCopy.transform.position = posL;
+                // // move position to adjust for change of size
+                // Vector3 posL = m_LineCopy.transform.position;
+                // posL += m_LineCopy.transform.up * deltaY;
+                // m_LineCopy.transform.position = posL;
 
-                m_LineCopy = null;
+                // m_LineCopy = null;
                 break;
             case Tool.Area:
-                Vector3 scaleA = m_AreaCopy.transform.localScale;
-                scaleA.x *= m_ScaleDivision;
-                if (scaleA.x < 1) {
-                    scaleA.x = 1;
-                }
-                else
-                {
-                    scaleA.x = Mathf.Round(scaleA.x);
-                }
+                // TODO: change back
+                m_DrawableArea.StopDrawing();
+                // TODO: change back
+                // Vector3 scaleA = m_AreaCopy.transform.localScale;
+                // scaleA.x *= m_ScaleDivision;
+                // if (scaleA.x < 1) {
+                //     scaleA.x = 1;
+                // }
+                // else
+                // {
+                //     scaleA.x = Mathf.Round(scaleA.x);
+                // }
 
-                scaleA.x /= m_ScaleDivision;
+                // scaleA.x /= m_ScaleDivision;
 
-                float deltaX = scaleA.x - m_AreaCopy.transform.localScale.x;
+                // float deltaX = scaleA.x - m_AreaCopy.transform.localScale.x;
 
-                m_AreaCopy.transform.localScale = scaleA;
+                // m_AreaCopy.transform.localScale = scaleA;
 
-                // move position
-                Vector3 posA = m_AreaCopy.transform.position;
-                posA += m_AreaCopy.transform.right * deltaX / 2;
-                m_AreaCopy.transform.position = posA;
+                // // move position
+                // Vector3 posA = m_AreaCopy.transform.position;
+                // posA += m_AreaCopy.transform.right * deltaX / 2;
+                // m_AreaCopy.transform.position = posA;
 
-                m_AreaCopy = null;
+                // m_AreaCopy = null;
                 Destroy(m_LineForArea);
                 break;
             case Tool.Volume:
-                if (m_VolumeCopy != null)
+                // if (m_VolumeCopy != null)
+                // {
+                if (m_MeshForVolume == null)
                 {
-                    Vector3 scaleV = m_VolumeCopy.transform.localScale;
-                    scaleV.z *= m_ScaleDivision;
-                    if (scaleV.z < 1)
-                    {
-                        scaleV.z = 1;
-                    }
-                    else
-                    {
-                        scaleV.z = Mathf.Round(scaleV.z);
-                    }
+                    // TODO: change back
+                    m_DrawableVolume.StopDrawing();
+                    // TODO: change back
+                    // Vector3 scaleV = m_VolumeCopy.transform.localScale;
+                    // scaleV.z *= m_ScaleDivision;
+                    // if (scaleV.z < 1)
+                    // {
+                    //     scaleV.z = 1;
+                    // }
+                    // else
+                    // {
+                    //     scaleV.z = Mathf.Round(scaleV.z);
+                    // }
 
-                    scaleV.z /= m_ScaleDivision;
+                    // scaleV.z /= m_ScaleDivision;
 
-                    float deltaZ = scaleV.z - m_VolumeCopy.transform.localScale.z;
+                    // float deltaZ = scaleV.z - m_VolumeCopy.transform.localScale.z;
 
-                    m_VolumeCopy.transform.localScale = scaleV;
+                    // m_VolumeCopy.transform.localScale = scaleV;
 
-                    // move position
-                    Vector3 posV = m_VolumeCopy.transform.position;
-                    posV += m_VolumeForward.normalized * deltaZ / 2;
-                    m_VolumeCopy.transform.position = posV;
+                    // mIntroductionScript.CheckVolume(m_VolumeCopy.transform, m_ScaleDivision);
 
-                    m_VolumeCopy = null;
+                    // // move position
+                    // Vector3 posV = m_VolumeCopy.transform.position;
+                    // posV += m_VolumeForward.normalized * deltaZ / 2;
+                    // m_VolumeCopy.transform.position = posV;
+
+                    // m_VolumeCopy = null;
                     Destroy(m_AreaForVolume);
                 }
-                else if (m_MeshForVolume != null)
+                else
                 {
                     m_PointerController.DecreaseSizeOfPointer();
 
@@ -513,7 +582,7 @@ public class InputController : MonoBehaviour
             Vector3 updatedValue = Vector3.Project((currentPosition - initialPosition), m_MeshCreatorController.GetNorm());
             if (snapToGrid)
             {
-                float scale = m_ScaleDivision; // TODO: change
+                float scale = m_ScaleDivision;
                 updatedValue *= scale;
                 // TODO: this should be rounded based on the direction it is going in
                 // we want to round the magnitude to the nearest whole number
