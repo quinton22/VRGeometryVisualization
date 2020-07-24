@@ -34,7 +34,7 @@ public class DrawableSphere : DrawableShape
 
         Vector3 scale = m_Shape.transform.localScale;
         scale.x = base.SnapToGrid(scale.x, subdivisionScale: m_SubdivisionScale / 2);
-        float deltaX = scale.x - m_Shape.transform.localScale.x;
+        scale.y = scale.z = scale.x;
 
         m_Shape.transform.localScale = scale;
 

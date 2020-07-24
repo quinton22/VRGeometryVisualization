@@ -285,7 +285,7 @@ public class InputController : MonoBehaviour
                 break;
             case Tool.Sphere:
                 drawing = Tool.Sphere;
-                m_DrawableLine.StartDrawing(m_Pointer.transform.position);
+                m_DrawableSphere.StartDrawing(m_Pointer.transform.position);
                 break;
             case Tool.Mesh:
                 
@@ -312,6 +312,8 @@ public class InputController : MonoBehaviour
             drawableShape = m_DrawableLine;
         else if (m_CurrentTool == Tool.Area)
             drawableShape = m_DrawableArea;
+        else if (m_CurrentTool == Tool.Sphere)
+            drawableShape = m_DrawableSphere;
         else
             drawableShape = m_DrawableVolume;
 
@@ -375,6 +377,9 @@ public class InputController : MonoBehaviour
                     drawing = Tool.None;
 
                 }
+                break;
+            case Tool.Sphere:
+                m_DrawableSphere.StopDrawing(m_SnapToGrid);
                 break;
             case Tool.Mesh:
                 if (drawing != Tool.Mesh) // start drawing mesh
