@@ -14,6 +14,7 @@ public class InputController : MonoBehaviour
         Line,
         Area,
         Volume,
+        Sphere,
         Mesh
     }
 
@@ -22,9 +23,11 @@ public class InputController : MonoBehaviour
     private DrawableLine m_DrawableLine;
     private DrawableArea m_DrawableArea;
     private DrawableVolume m_DrawableVolume;
+    private DrawableSphere m_DrawableSphere;
 
 
 
+    public bool m_SnapToGrid = true;
 
 
 
@@ -72,7 +75,9 @@ public class InputController : MonoBehaviour
         m_DrawableLine = GetComponent<DrawableLine>();
         m_DrawableArea = GetComponent<DrawableArea>();
         m_DrawableVolume = GetComponent<DrawableVolume>();
+        m_DrawableSphere = GetComponent<DrawableSphere>();
 
+        // For introduction
         m_DrawableVolume.AddListener(() => { mIntroductionScript.CheckVolume(m_DrawableVolume.m_LastCreatedShape.transform, DrawableVolume.m_SubdivisionScale);},
             DrawableVolume.ListenerType.PostFinish);
 
@@ -278,6 +283,10 @@ public class InputController : MonoBehaviour
                     Dragged();
                 } 
                 break;
+            case Tool.Sphere:
+                drawing = Tool.Sphere;
+                m_DrawableLine.StartDrawing(m_Pointer.transform.position);
+                break;
             case Tool.Mesh:
                 
                 
@@ -329,11 +338,11 @@ public class InputController : MonoBehaviour
         {
             case Tool.Line:
                 // TODO: change back
-                m_DrawableLine.StopDrawing();
+                m_DrawableLine.StopDrawing(m_SnapToGrid);
                 break;
             case Tool.Area:
                 // TODO: change back
-                m_DrawableArea.StopDrawing();
+                m_DrawableArea.StopDrawing(m_SnapToGrid);
 
                 Destroy(m_LineForArea);
                 break;
@@ -343,7 +352,7 @@ public class InputController : MonoBehaviour
                 if (m_MeshForVolume == null)
                 {
                     // TODO: change back
-                    m_DrawableVolume.StopDrawing();
+                    m_DrawableVolume.StopDrawing(m_SnapToGrid);
 
                     Destroy(m_AreaForVolume);
                 }

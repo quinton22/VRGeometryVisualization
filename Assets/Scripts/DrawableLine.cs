@@ -31,33 +31,25 @@ public class DrawableLine : DrawableShape
         InvokeListener(ListenerType.PostDraw);
     }
 
-    public override void StopDrawing()
+    public override void StopDrawing(bool snapToGrid)
     {
         InvokeListener(ListenerType.PreFinish);
+        base.StopDrawing(snapToGrid);
 
-        float sd = m_SubdivisionScale * 2;
         // round to nearest (sub)unit
-        Vector3 scaleL = m_Shape.transform.localScale;
-        scaleL.y *= sd;
-        if (scaleL.y < 1) {
-            scaleL.y = 1;
-        }
-        else
-        {
-            scaleL.y = Mathf.Round(scaleL.y);
-        }
-        scaleL.y /= sd;
+        Vector3 scale = m_Shape.transform.localScale;
+        scale.y = base.SnapToGrid(scale.y, subdivisionScale: m_SubdivisionScale * 2);
 
-        float deltaY = scaleL.y - m_Shape.transform.localScale.y;
+        float deltaY = scale.y - m_Shape.transform.localScale.y;
 
-        m_Shape.transform.localScale = scaleL;
+        m_Shape.transform.localScale = scale;
 
         // move position to adjust for change of size
         Vector3 posL = m_Shape.transform.position;
         posL += m_Shape.transform.up * deltaY;
         m_Shape.transform.position = posL;
 
-        base.StopDrawing();
+        
 
         InvokeListener(ListenerType.PostFinish);
     }
