@@ -6,21 +6,19 @@ public class SliderController : MonoBehaviour
 {
     public Text SliderText;
     public float limit;
-    private int[] range = new int[]{1, 20};
-   private GlobalGridScale globalGridScale;
+    private int[] range = new int[]{1, 30};
    // TODO: find some programmatic way to get total scale, rn it's just 1-20 hardcoded here
 
    void Awake()
    {
-       globalGridScale = FindObjectOfType<GlobalGridScale>();
-       SliderText.text = $"Scale: {globalGridScale.GridScale}";
+       SliderText.text = $"Scale: {GlobalGridScale.Instance.GridScale}";
        SetSlider();
    }
 
    void SetSlider()
    {
        Vector3 pos = transform.localPosition;
-       pos.x = ((globalGridScale.GridScale - 1) / (range[1] - range[0]) * 2 - 1) * limit;
+       pos.x = (((GlobalGridScale.Instance.GridScale - 1.0f) / (range[1] - range[0])) * 2 - 1) * limit;
        transform.localPosition = pos;
    }
 
@@ -37,8 +35,8 @@ public class SliderController : MonoBehaviour
 
    void UpdateGrid()
    {
-       globalGridScale.GridScale = (int) ((transform.localPosition.x / (limit) + 1) / 2f * (range[1] - range[0]) + 1);
-       SliderText.text = $"Scale: {globalGridScale.GridScale}";
+       GlobalGridScale.Instance.GridScale = (int) ((transform.localPosition.x / (limit) + 1) / 2f * (range[1] - range[0]) + 1);
+       SliderText.text = $"Scale: {GlobalGridScale.Instance.GridScale}";
    }
 
 }

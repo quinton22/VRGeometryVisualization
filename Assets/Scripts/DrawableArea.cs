@@ -36,32 +36,22 @@ public class DrawableArea : DrawableShape
         InvokeListener(ListenerType.PostDraw);
     }
 
-    public override void StopDrawing()
+    public override void StopDrawing(bool snapToGrid)
     {
         InvokeListener(ListenerType.PreFinish);
+        base.StopDrawing(snapToGrid);
 
-        Vector3 scaleA = m_Shape.transform.localScale;
-        scaleA.x *= m_SubdivisionScale;
-        if (scaleA.x < 1) {
-            scaleA.x = 1;
-        }
-        else
-        {
-            scaleA.x = Mathf.Round(scaleA.x);
-        }
+        Vector3 scale = m_Shape.transform.localScale;
+        scale.x = base.SnapToGrid(scale.x, subdivisionScale: m_SubdivisionScale);
 
-        scaleA.x /= m_SubdivisionScale;
+        float deltaX = scale.x - m_Shape.transform.localScale.x;
 
-        float deltaX = scaleA.x - m_Shape.transform.localScale.x;
-
-        m_Shape.transform.localScale = scaleA;
+        m_Shape.transform.localScale = scale;
 
         // move position
         Vector3 posA = m_Shape.transform.position;
         posA += m_Shape.transform.right * deltaX / 2;
         m_Shape.transform.position = posA;
-
-        base.StopDrawing();
 
         InvokeListener(ListenerType.PostFinish);
     }

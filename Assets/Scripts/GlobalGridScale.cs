@@ -13,8 +13,8 @@ public class GlobalGridScale : Singleton<GlobalGridScale>
     
     public bool GridOn = true;
 
-    [Range(1, 20), SerializeField] 
-    private int m_GridScale = 4;
+    [Range(1, 30), SerializeField] 
+    private int m_GridScale = 20;
     public int GridScale {
         get { return m_GridScale; }
         set { m_GridScale = value; UpdateValues(); }

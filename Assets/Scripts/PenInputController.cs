@@ -143,6 +143,8 @@ public class PenInputController : MonoBehaviour
             m_InputController.SetTool(InputController.Tool.Area);
         else if (toolName.Contains("cube"))
             m_InputController.SetTool(InputController.Tool.Volume);
+        else if (toolName.Contains("sphere"))
+            m_InputController.SetTool(InputController.Tool.Sphere);
         else if (toolName.Contains("mesh"))
             m_InputController.SetTool(InputController.Tool.Mesh);
     }

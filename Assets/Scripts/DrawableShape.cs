@@ -6,7 +6,7 @@ using UnityEngine.Events;
 public abstract class DrawableShape : MonoBehaviour
 {
     public GameObject m_ShapeToClone;
-    public GameObject m_Shape;
+    protected GameObject m_Shape;
     public Transform m_ParentTransform;
     
     public static float m_SubdivisionScale { get; private set; }
@@ -23,6 +23,8 @@ public abstract class DrawableShape : MonoBehaviour
     {
         UpdateGridScale();
         GlobalGridScale.AddScaleListener(UpdateGridScale);
+
+        AddListener(PostFinish, ListenerType.PostFinish);
 
         RunOnAwake();
     }
@@ -44,7 +46,23 @@ public abstract class DrawableShape : MonoBehaviour
     {
         drawingCurrentPosition = currentPosition;
     }
-    public virtual void StopDrawing()
+    public virtual void StopDrawing(bool snapToGrid) {}
+
+    public float SnapToGrid(float dimension, float subdivisionScale)
+    {
+        dimension *= subdivisionScale;
+        if (dimension < 1) {
+            dimension = 1;
+        }
+        else
+        {
+            dimension = Mathf.Round(dimension);
+        }
+
+        return dimension / subdivisionScale;
+    }
+
+    private void PostFinish()
     {
         m_Shape = null;
         drawingStartPosition = null;

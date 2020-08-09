@@ -42,35 +42,25 @@ public class DrawableVolume : DrawableShape
         InvokeListener(ListenerType.PostDraw);
     }
 
-    public override void StopDrawing()
+    public override void StopDrawing(bool snapToGrid)
     {
         InvokeListener(ListenerType.PreFinish);
+        base.StopDrawing(snapToGrid);
 
-        Vector3 scaleV = m_Shape.transform.localScale;
-        scaleV.z *= m_SubdivisionScale;
-        if (scaleV.z < 1)
-        {
-            scaleV.z = 1;
-        }
-        else
-        {
-            scaleV.z = Mathf.Round(scaleV.z);
-        }
+        Vector3 scale = m_Shape.transform.localScale;
+        scale.z = base.SnapToGrid(scale.z, subdivisionScale: m_SubdivisionScale);
 
-        scaleV.z /= m_SubdivisionScale;
+        float deltaZ = scale.z - m_Shape.transform.localScale.z;
 
-        float deltaZ = scaleV.z - m_Shape.transform.localScale.z;
-
-        m_Shape.transform.localScale = scaleV;
+        m_Shape.transform.localScale = scale;
 
         // move position
         Vector3 posV = m_Shape.transform.position;
         posV += m_VolumeForward.normalized * deltaZ / 2;
         m_Shape.transform.position = posV;
 
-
+        // to check for introduction
         m_LastCreatedShape = m_Shape;
-        base.StopDrawing();
 
         InvokeListener(ListenerType.PostFinish);
     }
