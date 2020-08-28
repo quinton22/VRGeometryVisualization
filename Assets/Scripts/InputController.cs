@@ -24,6 +24,7 @@ public class InputController : MonoBehaviour
     private DrawableArea m_DrawableArea;
     private DrawableVolume m_DrawableVolume;
     private DrawableSphere m_DrawableSphere;
+    private DrawablePolygon m_DrawablePolygon;
 
 
 
@@ -76,6 +77,7 @@ public class InputController : MonoBehaviour
         m_DrawableArea = GetComponent<DrawableArea>();
         m_DrawableVolume = GetComponent<DrawableVolume>();
         m_DrawableSphere = GetComponent<DrawableSphere>();
+        m_DrawablePolygon = GetComponent<DrawablePolygon>();
 
         // For introduction
         m_DrawableVolume.AddListener(() => { mIntroductionScript.CheckVolume(m_DrawableVolume.m_LastCreatedShape.transform, DrawableVolume.m_SubdivisionScale);},

@@ -18,6 +18,7 @@ public class PenInputController : MonoBehaviour
     private bool shownDrawHint = false;
     private bool shownChangeToolHint = false;
     private Hand hintHand;
+    private DisplayToolType m_DisplayToolType;
     void Start()
     {
         interactable = GetComponent<Interactable>();
