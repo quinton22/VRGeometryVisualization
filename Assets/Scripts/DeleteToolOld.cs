@@ -4,7 +4,7 @@ using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
-public class DeleteTool : MonoBehaviour
+public class DeleteToolOld : MonoBehaviour
 {
     public SteamVR_Action_Boolean m_DeleteAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("Draw");
     private Interactable interactable;

@@ -8,7 +8,7 @@ public class VolumeTool : ToolType<DrawableVolume>
         get { return Tool.Volume; }
     }
 
-    void Awake() {
+    protected override void OnAwake() {
         m_DrawableShape = GetComponent<DrawableVolume>();
     }
 

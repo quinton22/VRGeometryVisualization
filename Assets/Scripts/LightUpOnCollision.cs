@@ -17,7 +17,7 @@ public class LightUpOnCollision : MonoBehaviour
     [System.NonSerialized]
     public bool wasEnabled = true;
     private PointerController pointerController;
-    private DeleteTool deleteTool;
+    private DeleteToolOld deleteTool;
     [SerializeField]
     private bool transparent = false;
     private ShaderVariant shaderVariant;
@@ -71,7 +71,7 @@ public class LightUpOnCollision : MonoBehaviour
     {
         mInputController = FindObjectOfType<InputController>();
         pointerController = FindObjectOfType<PointerController>();
-        deleteTool = FindObjectOfType<DeleteTool>();
+        deleteTool = FindObjectOfType<DeleteToolOld>();
 
         m_MeshRenderer = GetComponent<MeshRenderer>();
         m_Mat = m_MeshRenderer.material;

@@ -65,7 +65,7 @@ public class InputController : MonoBehaviour
     private PointerController m_PointerController;
     private PenInputController penInput;
     private Vector3 initialPenPosition;
-    private DeleteTool deleteTool;
+    private DeleteToolOld deleteTool;
     private Vector3 initialDeleteToolPosition;
     private IntroductionScript mIntroductionScript;
 
@@ -102,7 +102,7 @@ public class InputController : MonoBehaviour
         penInput = FindObjectOfType<PenInputController>();
         initialPenPosition = penInput.transform.position;
 
-        deleteTool = FindObjectOfType<DeleteTool>();
+        deleteTool = FindObjectOfType<DeleteToolOld>();
         initialDeleteToolPosition = deleteTool.transform.position;
     }
 

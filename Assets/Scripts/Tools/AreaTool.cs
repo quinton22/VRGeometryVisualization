@@ -8,7 +8,7 @@ public class AreaTool : ToolType<DrawableArea>
         get { return Tool.Area; }
     }
 
-    void Awake() {
+    protected override void OnAwake() {
         m_DrawableShape = GetComponent<DrawableArea>();
     }
 

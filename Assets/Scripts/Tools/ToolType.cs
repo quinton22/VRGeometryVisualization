@@ -8,7 +8,8 @@ public enum Tool
     Volume,
     Sphere,
     Polygon,
-    Multi
+    Multi,
+    Delete
 }
 
 public abstract class ToolType<T> : MonoBehaviour where T : DrawableShape
@@ -28,7 +29,11 @@ public abstract class ToolType<T> : MonoBehaviour where T : DrawableShape
     void Awake() {
         m_PointerController =  m_Pointer.GetComponent<PointerController>();
         m_SnapToGrid = FindObjectOfType<InputController>().m_SnapToGrid;
+
+        OnAwake();
     }
+
+    protected virtual void OnAwake() {}
     
     public abstract void OnTriggerDown();
     public virtual void OnTriggerHold()

@@ -8,7 +8,7 @@ public class SphereTool : ToolType<DrawableSphere>
         get { return Tool.Sphere; }
     }
 
-    void Awake() {
+    protected override void OnAwake() {
         m_DrawableShape = GetComponent<DrawableSphere>();
     }
 

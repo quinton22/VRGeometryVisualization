@@ -8,7 +8,7 @@ public class LineTool : ToolType<DrawableLine>
         get { return Tool.Line; }
     }
 
-    void Awake() {
+    protected override void OnAwake() {
         m_DrawableShape = GetComponent<DrawableLine>();
     }
 
