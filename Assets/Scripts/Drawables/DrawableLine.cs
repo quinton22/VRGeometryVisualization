@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class DrawableLine : DrawableShape
 {
-    [SerializeField]
-    private float m_LineThickness; // TODO
+    [SerializeField] private float m_LineThickness; // TODO
 
+    public void DeleteLine()
+    {
+        Destroy(m_Shape);
+    }
     public override void StartDrawing(Vector3 startPosition)
     {  
         InvokeListener(ListenerType.PreStart);

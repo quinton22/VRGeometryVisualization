@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VolumeTool : ToolType<DrawableVolume>
+public class VolumeTool : ToolType
 {
     public override Tool Name {
         get { return Tool.Volume; }
     }
 
+    private GameObject polygon;
+
     protected override void OnAwake() {
         m_DrawableShape = GetComponent<DrawableVolume>();
+        if (isToolEnabled)
+            toolTypeList.Add(this);
     }
 
     // TODO: these should probably be removed at some point
@@ -18,23 +22,24 @@ public class VolumeTool : ToolType<DrawableVolume>
 
     public override void OnTriggerDown()
     {
+        base.OnTriggerDown();
         if (m_PointerController.collidingObject != null)
         {
             m_PointerController.IncreaseSizeOfPointer();
 
             if (m_PointerController.collidingObject.GetComponent<ShapeType>().m_ShapeType == ShapeTypeEnum.Area)
             {
-                GameObject area = m_PointerController.collidingObject.transform.parent.gameObject;
+                polygon = m_PointerController.collidingObject.transform.parent.gameObject;
                 // TODO: change back
-                m_DrawableShape.m_AreaLocalRotation = area.transform.localRotation;
-                m_DrawableShape.m_AreaLocalScale = area.transform.localScale;
-                m_DrawableShape.m_AreaForwardDir = area.transform.forward;
-                m_DrawableShape.StartDrawing(area.transform.position);
+                (m_DrawableShape as DrawableVolume).m_AreaLocalRotation = polygon.transform.localRotation;
+                (m_DrawableShape as DrawableVolume).m_AreaLocalScale = polygon.transform.localScale;
+                (m_DrawableShape as DrawableVolume).m_AreaForwardDir = polygon.transform.forward;
+                m_DrawableShape.StartDrawing(polygon.transform.position);
             }
             else if (m_PointerController.collidingObject.GetComponent<ShapeType>().m_ShapeType == ShapeTypeEnum.Polygon)
             {
                 // start extruding mesh
-                GameObject polygon = m_PointerController.collidingObject;
+                polygon = m_PointerController.collidingObject;
                // drawing = Tool.Volume;
                 initialPosition = polygon.transform.position;
                 
@@ -53,5 +58,6 @@ public class VolumeTool : ToolType<DrawableVolume>
     public override void OnTriggerUp()
     {
         base.OnTriggerUp();
+        Destroy(polygon);
     }
 }

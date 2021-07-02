@@ -33,8 +33,6 @@ public class InputController : MonoBehaviour
 
 
 
-
-
     // ================================================
 
     [System.NonSerialized]
@@ -63,7 +61,7 @@ public class InputController : MonoBehaviour
     [SerializeField] private GameObject m_Parent;
     [SerializeField] private GameObject m_Pointer;
     private PointerController m_PointerController;
-    private PenInputController penInput;
+    private NewInputController penInput;
     private Vector3 initialPenPosition;
     private DeleteToolOld deleteTool;
     private Vector3 initialDeleteToolPosition;
@@ -99,11 +97,11 @@ public class InputController : MonoBehaviour
 
         m_PointerController = m_Pointer.GetComponent<PointerController>();
 
-        penInput = FindObjectOfType<PenInputController>();
+        penInput = FindObjectOfType<NewInputController>();
         initialPenPosition = penInput.transform.position;
 
-        deleteTool = FindObjectOfType<DeleteToolOld>();
-        initialDeleteToolPosition = deleteTool.transform.position;
+        // deleteTool = FindObjectOfType<DeleteToolOld>();
+        // initialDeleteToolPosition = deleteTool.transform.position;
     }
 
     // Update is called once per frame

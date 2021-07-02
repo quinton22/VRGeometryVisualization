@@ -5,6 +5,10 @@ using System;
 
 public class DisplayToolType : MonoBehaviour
 {
+    public List<Tool> availableTools {
+        get { return _availableTools; }
+    }
+    private List<Tool> _availableTools = new List<Tool>();
     public float animationDuration = 1f;
     public float degreeRotation = 130;
     private Dictionary<Tool, GameObject> displayTools = new Dictionary<Tool, GameObject>();
@@ -13,9 +17,11 @@ public class DisplayToolType : MonoBehaviour
     private GameObject rotateOutGO;
     private float rotateInTime = -1;
     private GameObject rotateInGO;
+    private RectTransform rotateOutRect;
+    private RectTransform rotateInRect;
 
     void Awake() {
-        List<Tool> tools = new List<Tool>(Enum.GetValues(typeof(Tool)) as Tool[]);
+        List<Tool> tools = new List<Tool>(Enum.GetValues(typeof(Tool)) as Tool[]);;
 
         foreach (Transform child in transform)
         {
@@ -29,15 +35,22 @@ public class DisplayToolType : MonoBehaviour
                 }   
             }
 
-            child.rotation = Quaternion.Euler(0, 0, -130);
+            if (!child.name.ToLower().Contains(currentDisplayedTool.ToString().ToLower()))
+            {
+                child.GetComponent<RectTransform>().Rotate(new Vector3(0, 0, -130));
+                child.gameObject.SetActive(false);
+            }
+            
         }
+
+        _availableTools = new List<Tool>(displayTools.Keys);
     }
 
     void Update()
     {
         if (rotateOutTime >= 0 && rotateOutTime <= animationDuration)
         {
-            SpinOut(rotateOutTime / animationDuration);
+            SpinOut(Time.deltaTime / animationDuration);
             rotateOutTime += Time.deltaTime;
             if (rotateOutTime >= 0.5 * animationDuration && rotateInTime < 0)
             {
@@ -52,13 +65,23 @@ public class DisplayToolType : MonoBehaviour
         }
 
         if (rotateInTime >= 0 && rotateInTime <= animationDuration) {
-            SpinIn(rotateInTime / animationDuration);
+            SpinIn(Time.deltaTime / animationDuration);
             rotateInTime += Time.deltaTime;
         }
         else if (rotateInTime > animationDuration)
         {
             rotateInTime = -1;
         }
+    }
+
+    public void DisplayTriggerPull()
+    {
+
+    }
+
+    public void DisplayButtonPress()
+    {
+
     }
 
     public void DisplayTool(Tool tool)
@@ -76,23 +99,25 @@ public class DisplayToolType : MonoBehaviour
     {
         rotateOutTime = 0;
         rotateOutGO = obj;
+        rotateOutRect = obj.GetComponent<RectTransform>();
     }
 
     private void StartDisplaying(GameObject obj)
     {
         rotateInGO = obj;
-        rotateInGO.transform.rotation = Quaternion.Euler(0, 0, -130);
+        rotateInRect = obj.GetComponent<RectTransform>();
+        rotateInRect.localRotation = Quaternion.Euler(0, 0, -degreeRotation);
         rotateInGO.SetActive(true);
     }
 
     // TODO: move these to own class?
-    private void SpinOut(float percentEllapsed)
+    private void SpinOut(float percentChanged)
     {
-        rotateOutGO.transform.Rotate(0, 0, percentEllapsed * degreeRotation);
+        rotateOutRect.Rotate(new Vector3(0, 0, percentChanged * degreeRotation));
     }
 
-    private void SpinIn(float percentEllapsed)
+    private void SpinIn(float percentChanged)
     {
-        rotateOutGO.transform.Rotate(0, 0, percentEllapsed * degreeRotation);
+         rotateInRect.Rotate(new Vector3(0, 0, percentChanged * degreeRotation));
     }
 }

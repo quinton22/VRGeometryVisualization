@@ -67,7 +67,7 @@ __list__";
         challengesText.text = GetText();
     }
 
-    private bool isFinished()
+    public bool isFinished()
     {
         return finished.Count >= numberOfWaysComplete;
     }
@@ -124,7 +124,9 @@ __list__";
     {
         if (!shouldGiveHint) return $"Hint coming in ~{Mathf.RoundToInt(durationBeforeHint - currentDuration)} seconds";
         List<int[]> hints = GetAllHints();
-        return $"Try a shape with the volume {hints[0][0]} x {hints[0][1]} x {hints[0][2]}.";
+        if (hints.Count > 0)
+            return $"Try a shape with the volume {hints[0][0]} x {hints[0][1]} x {hints[0][2]}.";
+        else return "";
     }
 
     private List<int[]> GetAllHints()
